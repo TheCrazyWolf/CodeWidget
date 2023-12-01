@@ -1,0 +1,19 @@
+﻿@page "/"
+<PageTitle>Index</PageTitle>
+@code{
+   
+    string [] paths = Directory.GetFiles(File.ReadAllText(@"C:\Users\Ahtyamov\OneDrive\Рабочий стол\GtePath.txt"));
+}
+<nav >
+
+@foreach (var item in paths)
+{
+    <h4>@Path.GetFileName(item)</h4>
+}
+</nav>
+
+@foreach (var item in paths)
+{
+    string content = File.ReadAllText(item);
+    <pre>@content</pre>
+}
