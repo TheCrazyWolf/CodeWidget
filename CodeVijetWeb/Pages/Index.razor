@@ -1,19 +1,59 @@
 ﻿@page "/"
+@using System.Timers;
 <PageTitle>Index</PageTitle>
 @code{
+
+    private int _currentCount;
+    private System.Timers.Timer _timer;
+
+    protected override void OnInitialized()
+    {
+        _timer = new();
+        _timer.Interval = 1000;
+
+        _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
+        {
+            _currentCount++;
+            await InvokeAsync(StateHasChanged);
+        };
+        _timer.Enabled = true;
+    }
+
+    static string mainPath = File.ReadAllText(@"C:\Users\Ahtyamov\Desktop\GePath.txt");
+    List<string> paths = Directory.GetFiles(mainPath , "*.*", SearchOption.AllDirectories).
+     Where(x => x.EndsWith(".cs") 
+     || x.EndsWith("html")
+     || x.EndsWith("xaml")
+      || x.EndsWith("razor")
+     ).ToList();
+
+
    
-    string [] paths = Directory.GetFiles(File.ReadAllText(@"C:\Users\Ahtyamov\OneDrive\Рабочий стол\GtePath.txt"));
-}
-<nav >
 
-@foreach (var item in paths)
-{
-    <h4>@Path.GetFileName(item)</h4>
+   
+
+
+
 }
+<nav  class="" id="main">
+    <ul>
+        @for (int i = 0; i < paths.Count; i++)
+        {
+          <li>
+                <a href="#@i"
+                   target="_top">@paths[i].Remove( 0 , mainPath.Length)</a>
+          </li>  
+        }
+    </ul>
 </nav>
+  
 
-@foreach (var item in paths)
+@for (int i = 0; i < paths.Count; i++)
 {
-    string content = File.ReadAllText(item);
-    <pre>@content</pre>
+    string content = File.ReadAllText(paths[i]);
+    <div>
+        <h4 id="@i">@paths[i].Remove( 0 , mainPath.Length)</h4>
+        <pre>@content</pre>
+    </div>
+    <p class="text-break"> <a href="#main">up!</a></p>
 }
