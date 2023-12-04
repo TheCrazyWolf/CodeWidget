@@ -2,6 +2,7 @@
 
 public class CodeWidget
 {
+    public string FileName { get; set; }
     public string FullPath { get; set; }
     public string ShortPath { get; set; }
     public string Code { get; set; }
