@@ -5,7 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+/* Регистрация кастомного сервиса */
 builder.Services.AddSingleton<WatchDogService>();
+/* Добавление файла с настройками */
+builder.Configuration.AddJsonFile("appsettings.json");
 
 var app = builder.Build();
 
