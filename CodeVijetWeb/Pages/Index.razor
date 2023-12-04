@@ -10,50 +10,86 @@
     {
         _timer = new();
         _timer.Interval = 1000;
-
+        _currentCount++;
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _currentCount++;
             await InvokeAsync(StateHasChanged);
         };
         _timer.Enabled = true;
     }
-
     static string mainPath = File.ReadAllText(@"C:\Users\Ahtyamov\Desktop\GePath.txt");
-    List<string> paths = Directory.GetFiles(mainPath , "*.*", SearchOption.AllDirectories).
-     Where(x => x.EndsWith(".cs") 
-     || x.EndsWith("html")
-     || x.EndsWith("xaml")
-      || x.EndsWith("razor")
-     ).ToList();
+    List<string>  paths = GetStrings();
 
-
-   
-
-   
-
-
+    static List<string> GetStrings()
+    {
+       return Directory.GetFiles(mainPath, "*.*", SearchOption.AllDirectories).
+            Where(x => x.EndsWith(".cs")
+            || x.EndsWith("html")
+            || x.EndsWith("xaml")
+             || x.EndsWith("razor")
+            ).ToList();
+    }
 
 }
-<nav  class="" id="main">
-    <ul>
-        @for (int i = 0; i < paths.Count; i++)
+@{
+    paths = GetStrings();
+}
+
+ @for (int i = 0; i < paths.Count; i++)
+ {
+    if (File.Exists(paths[i]))
+    {
+        string content = File.ReadAllText(paths[i]);
+        if(content.Contains("//da"))
         {
-          <li>
-                <a href="#@i"
-                   target="_top">@paths[i].Remove( 0 , mainPath.Length)</a>
-          </li>  
+            <nav class="" id="main">
+                <ul>
+
+                    <li>
+                        <a href="#@i"
+                           target="_top">@paths[i].Remove( 0 , mainPath.Length)</a>
+                    </li>
+
+                </ul>
+            </nav>
         }
-    </ul>
-</nav>
-  
+    }
+   
+
+}
 
 @for (int i = 0; i < paths.Count; i++)
 {
-    string content = File.ReadAllText(paths[i]);
-    <div>
-        <h4 id="@i">@paths[i].Remove( 0 , mainPath.Length)</h4>
-        <pre>@content</pre>
-    </div>
-    <p class="text-break"> <a href="#main">up!</a></p>
+    if (File.Exists(paths[i]))
+    {
+        string content = File.ReadAllText(paths[i]);
+        if (content.Contains("//da"))
+        {
+           
+            if (content.Contains("//nocopy"))
+            {
+
+                <div>
+                    <h4 id="@i">@paths[i].Remove( 0 , mainPath.Length)</h4>
+                    <pre class="pre-no">@content</pre>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <h4 id="@i">@paths[i].Remove( 0 , mainPath.Length)</h4>
+                    <pre>@content</pre>
+                </div>
+            }
+            <p class="text-break "> <a href="#main">up!</a></p>
+        }
+    }
+    else
+    {
+        <div>
+            <h4 id="@i">@paths[i].Remove( 0 , mainPath.Length)</h4>
+            <pre>Файл удален</pre>
+        </div>
+        <p class="text-break"> <a href="#main">up!</a></p>
+    }
 }
