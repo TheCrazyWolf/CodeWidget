@@ -7,7 +7,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">CodeVijetWeb</a>
+        <a class="navbar-brand" href="">WidgetCode</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -17,14 +17,14 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Админ панель
             </NavLink>
         </div>
         @foreach (var menu in _widgetMenus)
         {
             <div class="nav-item px-3">
-                <NavLink class="nav-link" @onclick="()=> OpenWidget(menu)">
+                <NavLink class="nav-link" Match="NavLinkMatch.All" @onclick="() => OpenWidget(menu)">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> @menu.FileName
                 </NavLink>
             </div>
@@ -43,7 +43,6 @@
 
     protected override void OnInitialized()
     {
-        WatchDog.ChangePathForTracking("C:\\Users\\kulagin\\RiderProjects\\CodeWidget\\CodeVijetWeb");
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
             _widgetMenus = WatchDog.GetWidgets();
@@ -60,6 +59,6 @@
     {
         Navigation.NavigateTo($"/widget?PathWidget={widgetMenu.FullPath}");
     }
-
+    
 
 }
