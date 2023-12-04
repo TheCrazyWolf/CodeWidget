@@ -23,16 +23,21 @@
     static string mainPath = GetMainPath();                                                                  
     List<string>  paths = GetStrings();
 
+    private static IEnumerable<string> blackListedFiles = new List<string>()
+    {
+        ".git", ".idea", "obj", "bin"
+    };
 
     public static string GetMainPath ()
     {
-      return   File.ReadAllText(@"C:\Users\Ahtyamov\OneDrive\Рабочий стол\GtePath.txt"); //  файл
+      return "C:\\Users\\kulagin\\RiderProjects\\CodeWidget"; //  файл
                                                                                          //содержит  путь к  проекту
     }
     static List<string> GetStrings()
     {
-       return Directory.GetFiles(mainPath, "*.*", SearchOption.AllDirectories).
-            ToList();
+       return Directory.EnumerateFiles(mainPath, "*.*", SearchOption.AllDirectories)
+           .Where(file => !blackListedFiles.Any(blackPath => file.Contains(blackPath)))
+           .ToList();
     }
 
 }
