@@ -12,13 +12,16 @@ public class WatchDogService : BackgroundService
     
     /* Таймер для службы */
     private readonly int _timeWait = 1000;
+    
     public WatchDogService()
     {
         
     }
     
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        throw new NotImplementedException();
+        Task.Yield();
+        
+        await Task.Delay(_timeWait, stoppingToken);
     }
 }
