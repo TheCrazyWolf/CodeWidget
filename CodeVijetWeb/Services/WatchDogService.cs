@@ -33,6 +33,7 @@ public class WatchDogService : BackgroundService
 
     public WatchDogService()
     {
+        Task.Run(() => ExecuteAsync(new CancellationToken()));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -52,7 +53,7 @@ public class WatchDogService : BackgroundService
     {
         /* Надо реализовать более адекватную проверку, пока что не до неё
          */
-        _pathForTracking = string.IsNullOrEmpty(newPath) ? newPath : _pathForTracking;
+        _pathForTracking = string.IsNullOrEmpty(newPath) ? _pathForTracking : newPath;
     }
 
     private void FetchFiles()
