@@ -11,6 +11,8 @@ builder.Services.AddSingleton<WatchDogService>();
 /* Добавление файла с настройками */
 builder.Configuration.AddJsonFile("appsettings.json");
 
+//builder.WebHost.UseUrls("http://*:7070");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
