@@ -71,16 +71,14 @@ public class WatchDogService : BackgroundService
 
             var content = File.ReadAllText(path);
 
-            if (!content.Contains(_tagTrackCopyable) || !content.Contains(_tagTrackNoCopyable))
-                continue;
-
-            _widgets.Add(new CodeWidget
-            {
-                FullPath = path, ShortPath = "",
-                Code = content,
-                FileName = Path.GetFileName(path),
-                IsCopyable = content.Contains(_tagTrackCopyable)
-            });
+            if (content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable))
+                _widgets.Add(new CodeWidget
+                {
+                    FullPath = path, ShortPath = "",
+                    Code = content,
+                    FileName = Path.GetFileName(path),
+                    IsCopyable = content.Contains(_tagTrackCopyable)
+                });
         }
     }
 
