@@ -78,6 +78,7 @@ public class WatchDogService : BackgroundService
             {
                 FullPath = path, ShortPath = "",
                 Code = content,
+                FileName = Path.GetFileName(path),
                 IsCopyable = content.Contains(_tagTrackCopyable)
             });
         }
@@ -95,7 +96,7 @@ public class WatchDogService : BackgroundService
         return _widgets.Select(widget => new WidgetMenu
         {
             FullPath = widget.FullPath,
-            FileName = Path.GetFileName(widget.FullPath)
+            FileName = widget.FileName
         });
     }
 }
