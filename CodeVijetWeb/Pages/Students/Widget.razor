@@ -1,0 +1,76 @@
+﻿@page "/widget"
+
+@using CodeVijetWeb.Models
+@using CodeVijetWeb.Services
+@using System.Timers
+@using PrismSharp.Core
+@using PrismSharp.Highlighting.HTML
+
+@inject WatchDogService WatchDog;
+
+@if (_currentWidget is not null)
+{
+    <h2>@_currentWidget.FileName</h2>
+    <h4>@_currentWidget.FullPath</h4>
+
+    <div>
+        <pre class="language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
+            <code class="language-csharp">
+                @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code));
+            </code>
+        </pre>
+    </div>
+}
+else
+{
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? PathWidget { get; set; } /* Путь до файла*/
+
+    /* Текущий виджет */
+    private CodeWidget? _currentWidget;
+
+    private readonly Timer _timer = new() { Interval = 1000, Enabled = true };
+    
+    protected override Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(PathWidget))
+            return Task.CompletedTask;
+
+        _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
+        {
+            _currentWidget = WatchDog.GetCurrentWidget(PathWidget);
+            await InvokeAsync(StateHasChanged);
+        };
+
+        return Task.CompletedTask;
+    }
+    
+    /*
+     *  Рендерим подсвеченный код с помощью библиотеки
+     *  Prism
+     */
+
+    private string RenderTokenizeFromPrism(string value)
+    {
+        var grammar = LanguageGrammars.CSharp; 
+        var highlighter = new HtmlHighlighter();
+        var html = highlighter.Highlight(value, grammar, "html");
+        return html;
+    }
+
+    /*
+     * Рендеринг разрешающиего тега копировать или нет
+     */
+    private string RenderNoCopyClass(bool isCopyable)
+        => isCopyable ? string.Empty : "pre-no";
+
+}

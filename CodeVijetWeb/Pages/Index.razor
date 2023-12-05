@@ -1,105 +1,21 @@
 ﻿@page "/"
 @using System.Timers;
-<PageTitle>Index</PageTitle>
+
+<PageTitle>
+    CodeWidget
+</PageTitle>
+
+<h3>Добро пожаловать</h3>
+
+<p>На этом сервере будут отображаться, файлы проектов преподавателя</p>
+<p>Отображаться они будут в боковом меню</p>
+<p>Листинг обновляется в реал тайме (почти) пока преподаватель не нажмет CTRL S</p>
+
+<br/>
+<br/>
+by <a href="https://github.com/frakiec89">frakiec89</a> and <a href="https://github.com/TheCrazyWolf">TheCrazyWolf</a>
+<br/>
+Версия: Вроде работает, но не на сокетах)
+
 @code{
-
-    private int _currentCount;
-    private System.Timers.Timer _timer;
-    /// <summary>
-    /// Обновление // не  плохо бы  повесить на  соккет 
-    /// </summary>
-    protected override void OnInitialized()
-    {
-        _timer = new();
-        _timer.Interval = 1000;
-        _currentCount++;
-        _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
-        {
-            await InvokeAsync(StateHasChanged);
-        };
-        _timer.Enabled = true;
-    }
-
-    static string mainPath = GetMainPath();                                                                  
-    List<string>  paths = GetStrings();
-
-
-    public static string GetMainPath ()
-    {
-      return   File.ReadAllText(@"C:\Users\Ahtyamov\OneDrive\Рабочий стол\GtePath.txt"); //  файл
-                                                                                         //содержит  путь к  проекту
-    }
-    static List<string> GetStrings()
-    {
-       return Directory.GetFiles(mainPath, "*.*", SearchOption.AllDirectories).
-            ToList();
-    }
-
-}
-@{
-    mainPath = GetMainPath();  
-    paths = GetStrings();
-    List<string> pathsSelectDa = new List<string>();
-    foreach (var item in paths)
-    {
-        if(File.Exists(item))
-        {
-            string content = File.ReadAllText(item);
-            if (content.Contains("//da")) 
-            {
-                pathsSelectDa.Add(item);
-            }
-        }
-    }
-
-}
-
-@for (int i = 0; i < pathsSelectDa.Count; i++)
- {
-    if (File.Exists(pathsSelectDa[i]))
-    {
-            <nav class="" id="main">
-                <ul>
-
-                    <li>
-                        <a href="#@i"
-                       target="_top">@pathsSelectDa[i].Remove( 0 , mainPath.Length)</a>
-                    </li>
-
-                </ul>
-            </nav>
-        
-    }
-}
-
-@for (int i = 0; i < pathsSelectDa.Count; i++)
-{
-    if (File.Exists(pathsSelectDa[i]))
-    {
-        string content = File.ReadAllText(pathsSelectDa[i]);
-            if (content.Contains("//nocopy"))
-            {
-
-                <div>
-                <h4 id="@i">@pathsSelectDa[i].Remove( 0 , mainPath.Length)</h4>
-                    <pre class="pre-no">@content</pre>
-                </div>
-            }
-            else
-            {
-                <div>
-                <h4 id="@i">@pathsSelectDa[i].Remove( 0 , mainPath.Length)</h4>
-                    <pre>@content</pre>
-                </div>
-            }
-            <p class="text-break "> <a href="#main">up!</a></p>
-    }
-    else
-    {
-        <div>
-            <h4 id="@i">@pathsSelectDa[i].Remove( 0 , mainPath.Length)</h4>
-            <pre>Файл удален</pre>
-        </div>
-        <p class="text-break"> <a href="#main">up!</a></p>
-    }
 }

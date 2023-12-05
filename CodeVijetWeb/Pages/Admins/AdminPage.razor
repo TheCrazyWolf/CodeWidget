@@ -1,0 +1,53 @@
+﻿@page "/admin"
+@using CodeVijetWeb.Services
+
+@inject IConfiguration Config;
+@inject WatchDogService WatchDog;
+
+<h3>Админ панель</h3>
+@if (_isAuthorized)
+{
+    <div>
+        <div class="form-group">
+            <label>Путь до папки с проектом для отслеживания</label>
+            <input @bind="_newPath" type="text" class="form-control" placeholder="C:\Users\kulagin\RiderProjects\Api-Client-for-samgk.ru">
+        </div>
+        <button @onclick="ChangePathTracking" type="button" class="btn btn-primary">Сохранить</button>
+    </div>
+}
+else
+{
+    <div>
+        <div class="form-group">
+            <label>Введите админ-пароль</label>
+            <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
+        </div>
+        <button @onclick="CheckPassword" type="button" class="btn btn-primary">Войти</button>
+    </div>
+}
+
+
+@code {
+    private bool _isAuthorized = false;
+
+    private string _password = "";
+    private string _newPath = "";
+    
+    /* Наитупейшая проверка, но пойдет */
+    private void CheckPassword()
+    {
+        if(Config.GetValue<string>("Password") != _password)
+            return;
+
+        _isAuthorized = true;
+        StateHasChanged();
+    }
+
+    /* Смена папки для отслеживания */
+    private void ChangePathTracking()
+    {
+        if(_isAuthorized)
+            WatchDog.ChangePathForTracking(_newPath);
+    }
+    
+}

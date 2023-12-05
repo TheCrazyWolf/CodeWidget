@@ -1,6 +1,13 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using CodeVijetWeb.Services
+@using System.Timers
+@using CodeVijetWeb.Models
+
+@inject WatchDogService WatchDog;
+@inject NavigationManager Navigation;
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">CodeVijetWeb</a>
+        <a class="navbar-brand" href="">WidgetCode</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,20 +17,18 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Админ панель
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
+        @foreach (var menu in _widgetMenus)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" Match="NavLinkMatch.All" @onclick="() => OpenWidget(menu)">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @menu.FileName
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
@@ -32,8 +37,28 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    private Timer _timer = new() { Interval = 1000, Enabled = true, };
+
+    private IEnumerable<WidgetMenu> _widgetMenus = new List<WidgetMenu>();
+
+    protected override void OnInitialized()
+    {
+        _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
+        {
+            _widgetMenus = WatchDog.GetWidgets();
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    private void OpenWidget(WidgetMenu widgetMenu)
+    {
+        Navigation.NavigateTo($"/widget?PathWidget={widgetMenu.FullPath}");
+    }
+    
+
 }

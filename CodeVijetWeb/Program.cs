@@ -1,13 +1,17 @@
-using CodeVijetWeb.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using CodeVijetWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+
+/* Регистрация кастомного сервиса */
+builder.Services.AddSingleton<WatchDogService>();
+/* Добавление файла с настройками */
+builder.Configuration.AddJsonFile("appsettings.json");
+
+//builder.WebHost.UseUrls("http://*:7070");
 
 var app = builder.Build();
 
