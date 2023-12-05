@@ -13,7 +13,7 @@ builder.Configuration.AddJsonFile("appsettings.json");
 
 string s = builder.Configuration.GetValue<string>("Host");
 
- builder.WebHost.UseUrls(new string[] { "http://192.168.59.39:83" });
+ builder.WebHost.UseUrls(new string[] { s });
 
 var app = builder.Build();
 
