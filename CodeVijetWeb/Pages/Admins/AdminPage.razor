@@ -1,4 +1,5 @@
 ﻿@page "/admin"
+@using CodeVijetWeb.DB;
 @using CodeVijetWeb.Services
 
 @inject IConfiguration Config;
@@ -14,6 +15,15 @@
         </div>
         <button @onclick="ChangePathTracking" type="button" class="btn btn-primary">Сохранить</button>
     </div>
+
+    <div>
+        <h4>старые  проекты :</h4>
+    </div>
+    foreach (var item in GetHistoryApp())
+    {
+         <p>@item</p>
+    }
+    <button @onclick="ClearHistiry" class="btn btn-primary">очистить историю</button>
 }
 else
 {
@@ -24,6 +34,8 @@ else
         </div>
         <button @onclick="CheckPassword" type="button" class="btn btn-primary">Войти</button>
     </div>
+
+  
 }
 
 
@@ -32,7 +44,7 @@ else
 
     private string _password = "";
     private string _newPath = "";
-    
+
     /* Наитупейшая проверка, но пойдет */
     private void CheckPassword()
     {
@@ -47,7 +59,50 @@ else
     private void ChangePathTracking()
     {
         if(_isAuthorized)
+        {
             WatchDog.ChangePathForTracking(_newPath);
+            try // сохраним в  бд  
+            {
+                DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
+                sq_.Logs.Add(new DB.Logs() { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
+                sq_.SaveChanges();
+            }
+            catch // да  пофиг 
+            {}
+        }
+
     }
-    
+
+
+    /* старые  проекты */
+    private List<string> GetHistoryApp()
+    {
+
+        try // получим из бд
+        {
+            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
+            return sq_.Logs.OrderByDescending(d => d.Date).Select(x=>x.Path).Distinct().ToList();
+        }
+        catch
+        {
+            return new List<string> { "пока нет" }; // Пустой
+        }
+    }
+
+
+    /* старые  проекты */
+    private void ClearHistiry()
+    {
+
+        try // получим из бд
+        {
+            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
+            sq_.Logs.RemoveRange(sq_.Logs);
+            sq_.SaveChanges();
+
+        }
+        catch
+        {
+        }
+    }
 }
