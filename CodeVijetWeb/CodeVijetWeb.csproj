@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>free-icon-food-waste-12184584.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,10 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.css" />
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="free-icon-food-waste-12184584.ico" />
   </ItemGroup>
 
   <ItemGroup>
