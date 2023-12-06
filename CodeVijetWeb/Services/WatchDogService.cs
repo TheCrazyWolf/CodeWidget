@@ -13,7 +13,7 @@ public class WatchDogService : BackgroundService
     private string _pathForTracking = "";
 
     /* Таймер для службы */
-    private readonly int _timeWait = 1000;
+    private readonly int _timeWait;
 
     /*
      * Черный контейнер для игнора
@@ -41,6 +41,7 @@ public class WatchDogService : BackgroundService
         /* Грузим теги из конфиг файла, если там пусто - ставим значение по умолчанию */
         _tagTrackCopyable = _configuration.GetValue<string>("tagForTrack") ?? "// track";
         _tagTrackNoCopyable = _configuration.GetValue<string>("tagForTrackAndNoCopy") ?? "// nocopy";
+        _timeWait = _configuration.GetValue<int>("TimerForFetchFiles");
         
         Task.Run(() => ExecuteAsync(new CancellationToken()));
     }
