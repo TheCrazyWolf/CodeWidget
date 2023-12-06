@@ -362,6 +362,12 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Rider детектит эти файлы 
 bin/
 obj/
 .idea/
+
+# Не детектить файлы БД и не пушить их репозиторий
+*.db
+*.db-shm
+*.db-wal

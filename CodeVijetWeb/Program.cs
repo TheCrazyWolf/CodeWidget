@@ -1,5 +1,5 @@
+using CodeVijetWeb.DB;
 using CodeVijetWeb.Services;
-using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -11,9 +11,13 @@ builder.Services.AddSingleton<WatchDogService>();
 /* Добавление файла с настройками */
 builder.Configuration.AddJsonFile("appsettings.json");
 
-string s = builder.Configuration.GetValue<string>("Host");
+/* Настраиваем сервер для доступа во внешнюю сеть,
+ * Указываем на каком порте работать из конфиг файла */
+builder.WebHost.ConfigureKestrel(
+    options => options.ListenAnyIP(builder.Configuration.GetValue<int>("HostPort")));
 
- builder.WebHost.UseUrls(new string[] { s });
+/* Добавление Контекста подключения в завимости */
+builder.Services.AddDbContext<Sq_lite_Context>();
 
 var app = builder.Build();
 
@@ -25,7 +29,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

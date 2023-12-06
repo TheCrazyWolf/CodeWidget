@@ -4,4 +4,5 @@ public class WidgetMenu
 {
     public string FullPath { get; set; }
     public string FileName { get; set; }
+    public string ShortPath { get; set; }
 }
