@@ -65,9 +65,8 @@ else
         WatchDog.ChangePathForTracking(_newPath);
         try // сохраним в  бд  
         {
-            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
-            sq_.Logs.Add(new DB.Logs() { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
-            sq_.SaveChanges();
+            Ef.Logs.Add(new Logs { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
+            Ef.SaveChanges();
         }
         catch // да  пофиг 
         {}
@@ -77,16 +76,7 @@ else
     /* старые  проекты */
     private List<string> GetHistoryApp()
     {
-
-        try // получим из бд
-        {
-            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
-            return sq_.Logs.OrderByDescending(d => d.Date).Select(x=>x.Path).Distinct().ToList();
-        }
-        catch
-        {
-            return new List<string> { "пока нет" }; // Пустой
-        }
+        return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
     }
 
 
@@ -96,10 +86,8 @@ else
 
         try // получим из бд
         {
-            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
-            sq_.Logs.RemoveRange(sq_.Logs);
-            sq_.SaveChanges();
-
+            Ef.Logs.RemoveRange(Ef.Logs);
+            Ef.SaveChanges();
         }
         catch
         {
