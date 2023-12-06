@@ -28,8 +28,8 @@ public class WatchDogService : BackgroundService
     private IList<CodeWidget> _widgets = new List<CodeWidget>();
 
     /* Теги для отслеживания файлов, которые можно прочитать */
-    private readonly string _tagTrackCopyable = "// track";
-    private readonly string _tagTrackNoCopyable = "// nocopy";
+    private readonly string _tagTrackCopyable;
+    private readonly string _tagTrackNoCopyable;
 
     /* Поле для доступа к конфиг файла */
     private readonly IConfiguration _configuration;
