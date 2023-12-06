@@ -9,34 +9,43 @@
 <h3>Админ панель</h3>
 @if (_isAuthorized)
 {
-    <div>
-        <div class="form-group">
+    <h4 class="mt-4">Текущий проект для отслеживания</h4>
+    <div class="card shadow-lg rounded">
+        <div class="card-body">
             <label>Путь до папки с проектом для отслеживания</label>
-            <input @bind="_newPath" type="text" class="form-control" placeholder="C:\Users\kulagin\RiderProjects\Api-Client-for-samgk.ru">
+            <div class="mt-2 d-flex">
+                <input @bind="_newPath" type="text" class="form-control" placeholder="C:\Users\kulagin\RiderProjects\Api-Client-for-samgk.ru">
+                <button @onclick="ChangePathTracking" type="button" class="ms-2 btn btn-primary">Сохранить</button>
+            </div>
         </div>
-        <button @onclick="ChangePathTracking" type="button" class="btn btn-primary">Сохранить</button>
     </div>
 
-    <div>
-        <h4>старые  проекты :</h4>
+    <div class="mt-4">
+        <h4>Последние проекты:</h4>
     </div>
     foreach (var item in GetHistoryApp())
     {
-         <p>@item</p>
+        <div class="mt-4 card shadow-sm rounded">
+            <div class="card-body">
+                <input readonly type="text" value="@item" class="form-control">
+            </div>
+        </div>
     }
-    <button @onclick="ClearHistiry" class="btn btn-primary">очистить историю</button>
+    <div class="mt-4">
+        <button @onclick="ClearHistiry" class="btn btn-primary">Очистить историю</button>
+    </div>
 }
 else
 {
-    <div>
-        <div class="form-group">
+    <div class="mt-4 card shadow-lg rounded">
+        <div class="card-body">
             <label>Введите админ-пароль</label>
-            <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
+            <div class="mt-2 d-flex">
+                <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
+                <button @onclick="CheckPassword" type="button" class="ms-2 btn btn-primary">Войти</button>
+            </div>
         </div>
-        <button @onclick="CheckPassword" type="button" class="btn btn-primary">Войти</button>
     </div>
-
-  
 }
 
 
@@ -47,9 +56,10 @@ else
     private string _newPath = "";
 
     /* Наитупейшая проверка, но пойдет */
+
     private void CheckPassword()
     {
-        if(Config.GetValue<string>("Password") != _password)
+        if (Config.GetValue<string>("Password") != _password)
             return;
 
         _isAuthorized = true;
@@ -57,23 +67,30 @@ else
     }
 
     /* Смена папки для отслеживания */
+
     private void ChangePathTracking()
     {
-        if (!_isAuthorized) 
+        if (!_isAuthorized)
+            return;
+
+        WatchDog.ChangePathForTracking(_newPath);
+        
+        if(string.IsNullOrEmpty(_newPath))
             return;
         
-        WatchDog.ChangePathForTracking(_newPath);
         try // сохраним в  бд  
         {
             Ef.Logs.Add(new Logs { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
             Ef.SaveChanges();
         }
         catch // да  пофиг 
-        {}
+        {
+        }
     }
 
 
     /* старые  проекты */
+
     private List<string> GetHistoryApp()
     {
         return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
@@ -81,9 +98,9 @@ else
 
 
     /* старые  проекты */
+
     private void ClearHistiry()
     {
-
         try // получим из бд
         {
             Ef.Logs.RemoveRange(Ef.Logs);
@@ -93,4 +110,5 @@ else
         {
         }
     }
+
 }
