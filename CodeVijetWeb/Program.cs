@@ -1,4 +1,4 @@
-using System.Net;
+using CodeVijetWeb.DB;
 using CodeVijetWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +15,9 @@ builder.Configuration.AddJsonFile("appsettings.json");
  * Указываем на каком порте работать из конфиг файла */
 builder.WebHost.ConfigureKestrel(
     options => options.ListenAnyIP(builder.Configuration.GetValue<int>("HostPort")));
+
+/* Добавление Контекста подключения в завимости */
+builder.Services.AddDbContext<Sq_lite_Context>();
 
 var app = builder.Build();
 
