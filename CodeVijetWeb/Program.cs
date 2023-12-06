@@ -1,7 +1,7 @@
 using CodeVijetWeb.Services;
+using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -11,7 +11,9 @@ builder.Services.AddSingleton<WatchDogService>();
 /* Добавление файла с настройками */
 builder.Configuration.AddJsonFile("appsettings.json");
 
-//builder.WebHost.UseUrls("http://*:7070");
+string s = builder.Configuration.GetValue<string>("Host");
+
+ builder.WebHost.UseUrls(new string[] { s });
 
 var app = builder.Build();
 
