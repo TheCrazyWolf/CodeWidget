@@ -10,13 +10,17 @@
 
 @if (_currentWidget is not null)
 {
-    <h2>@_currentWidget.FileName</h2>
-    <h4>@_currentWidget.FullPath</h4>
+    <div class="card shadow-lg rounded">
+        <div class="card-body">
+            <h4>Листинг файла: @_currentWidget.FileName</h4>
+            <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
+        </div>
+    </div>
 
-    <div>
-        <pre class="language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
-            <code class="language-csharp">
-                @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code) )
+    <div class="mt-4 mb-5 card shadow-lg rounded">
+        <pre class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
+            <code>
+                @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
             </code>
         </pre>
     </div>
@@ -39,7 +43,7 @@ else
     private CodeWidget? _currentWidget;
 
     private readonly Timer _timer = new() { Interval = 1000, Enabled = true };
-    
+
     protected override Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(PathWidget))
@@ -53,7 +57,7 @@ else
 
         return Task.CompletedTask;
     }
-    
+
     /*
      *  Рендерим подсвеченный код с помощью библиотеки
      *  Prism
@@ -61,7 +65,7 @@ else
 
     private string RenderTokenizeFromPrism(string value)
     {
-        var grammar = LanguageGrammars.CSharp; 
+        var grammar = LanguageGrammars.CSharp;
         var highlighter = new HtmlHighlighter();
         var html = highlighter.Highlight(value, grammar, "html");
         return html;
@@ -70,6 +74,7 @@ else
     /*
      * Рендеринг разрешающиего тега копировать или нет
      */
+
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
 
