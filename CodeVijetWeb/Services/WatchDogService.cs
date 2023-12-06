@@ -84,7 +84,9 @@ public class WatchDogService : BackgroundService
                 _widgets.Add(new CodeWidget
                 {
                     FullPath = path, ShortPath = "",
-                    Code = content,
+                    /* Помещаем туда код и удаляем теги для вида. Зачем? да просто*/
+                    Code = content.Replace(_tagTrackCopyable, string.Empty)
+                        .Replace(_tagTrackNoCopyable, string.Empty),
                     FileName = Path.GetFileName(path),
                     IsCopyable = content.Contains(_tagTrackCopyable)
                 });
