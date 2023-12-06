@@ -1,3 +1,4 @@
+using System.Net;
 using CodeVijetWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +11,10 @@ builder.Services.AddSingleton<WatchDogService>();
 /* Добавление файла с настройками */
 builder.Configuration.AddJsonFile("appsettings.json");
 
-string s = builder.Configuration.GetValue<string>("Host");
-
- builder.WebHost.UseUrls(new string[] { s });
+/* Настраиваем сервер для доступа во внешнюю сеть,
+ * Указываем на каком порте работать из конфиг файла */
+builder.WebHost.ConfigureKestrel(
+    options => options.ListenAnyIP(builder.Configuration.GetValue<int>("HostPort")));
 
 var app = builder.Build();
 
