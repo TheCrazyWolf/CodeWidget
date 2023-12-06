@@ -24,7 +24,7 @@
         @foreach (var menu in _widgetMenus)
         {
             <div class="nav-item px-3">
-                <NavLink class="nav-link" Match="NavLinkMatch.All" @onclick="() => OpenWidget(menu)">
+                <NavLink class="nav-link" role='button' Match="NavLinkMatch.All" @onclick="() => OpenWidget(menu)">
                     <span class="oi oi-list-rich" aria-hidden="true"></span> @menu.ShortPath
                 </NavLink>
             </div>
