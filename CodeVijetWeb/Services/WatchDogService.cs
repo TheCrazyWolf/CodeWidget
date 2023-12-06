@@ -21,7 +21,7 @@ public class WatchDogService : BackgroundService
      */
     private readonly IEnumerable<string> _blackContainerPaths = new List<string>()
     {
-        ".git", ".idea", "obj", "bin"
+        ".git", ".idea", "obj", "bin", ".vs"
     };
 
     /* Виджеты с кодом */
