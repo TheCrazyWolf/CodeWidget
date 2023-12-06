@@ -59,19 +59,18 @@ else
     /* Смена папки для отслеживания */
     private void ChangePathTracking()
     {
-        if(_isAuthorized)
+        if (!_isAuthorized) 
+            return;
+        
+        WatchDog.ChangePathForTracking(_newPath);
+        try // сохраним в  бд  
         {
-            WatchDog.ChangePathForTracking(_newPath);
-            try // сохраним в  бд  
-            {
-                DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
-                sq_.Logs.Add(new DB.Logs() { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
-                sq_.SaveChanges();
-            }
-            catch // да  пофиг 
-            {}
+            DB.Sq_lite_Context sq_ = new DB.Sq_lite_Context();
+            sq_.Logs.Add(new DB.Logs() { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
+            sq_.SaveChanges();
         }
-
+        catch // да  пофиг 
+        {}
     }
 
 
