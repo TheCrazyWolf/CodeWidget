@@ -17,8 +17,8 @@
         </div>
     </div>
 
-    <div class="mt-4 mb-5 card shadow-lg rounded">
-        <pre class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
+    <div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
+        <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
             <code>
                 @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
             </code>
