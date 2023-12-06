@@ -2,9 +2,12 @@
 
 namespace CodeVijetWeb.DB
 {
-    public class Sq_lite_Context : DbContext 
+    public class Sq_lite_Context : DbContext
     {
-      
+
+        public Sq_lite_Context()
+            => Database.MigrateAsync();
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Filename=historyApp.db");
