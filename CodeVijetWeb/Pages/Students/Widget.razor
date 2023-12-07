@@ -10,33 +10,41 @@
 
 <PageTitle>Листинг</PageTitle>
 
-@if (_currentWidget is not null)
-{
-    <div class="card shadow-lg rounded">
-        <div class="card-body">
+<div class="card shadow-lg rounded">
+    <div class="card-body">
+        @if (_currentWidget is not null)
+        {
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-        </div>
+        }
+        else
+        {
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
     </div>
+</div>
 
-    <div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
-        <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
+<div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
+    <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
             <code>
-                @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+    @if (_currentWidget is not null)
+    {
+        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+    }
+    else
+    {
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
             </code>
         </pre>
-    </div>
-}
-else
+</div>
+
+@code
 {
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-}
-
-
-@code {
-
     [Parameter]
     [SupplyParameterFromQuery]
     public string? PathWidget { get; set; } /* Путь до файла*/
@@ -79,5 +87,4 @@ else
 
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
-
 }
