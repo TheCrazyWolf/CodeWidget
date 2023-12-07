@@ -37,16 +37,18 @@
 }
 else
 {
-    <div class="mt-4 card shadow-lg rounded">
-        <div class="card-body">
-            <label>Введите админ-пароль</label>
-            <div class="mt-2 d-flex">
-                <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
-                <button @onclick="CheckPassword" type="button" class="ms-2 btn btn-primary">Войти</button>
+    <div style="height: 100vh;" class="d-flex align-items-center justify-content-center">
+        <div class="card shadow-lg rounded">
+            <div class="card-body">
+                <label>Введите админ-пароль</label>
+                <div class="mt-2 d-flex">
+                    <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
+                    <button @onclick="CheckPassword" type="button" class="ms-2 btn btn-primary">Войти</button>
+                </div>
             </div>
         </div>
     </div>
-}
+}}
 
 
 @code {
