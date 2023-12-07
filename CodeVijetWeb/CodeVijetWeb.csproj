@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="free-icon-food-waste-12184584.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="historyApp.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
