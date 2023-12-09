@@ -123,12 +123,14 @@ else
         }
     }
 
-
     /// <summary>
     /// Возращает историю последних проектов из Базы данных
     /// </summary>
     private List<string> GetHistoryApp()
     {
+        if (!_isAuthorized)
+            return new List<string>();
+        
         try // сохраним в  бд  
         {
             return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
@@ -147,6 +149,9 @@ else
     /// </summary>
     private void ClearHistiry()
     {
+        if (!_isAuthorized)
+            return;
+        
         try // получим из бд
         {
             Ef.Logs.RemoveRange(Ef.Logs);
