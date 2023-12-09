@@ -5,10 +5,6 @@ VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeVijetWeb", "CodeVijetWeb\CodeVijetWeb.csproj", "{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{D3F9B241-8259-4710-9250-77CE897B6F82}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{1661C41C-265B-4055-98FA-CB35A6D0A5FC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,8 +21,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F4D891-6049-42E6-993B-3DA1990F42A8}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{1661C41C-265B-4055-98FA-CB35A6D0A5FC} = {D3F9B241-8259-4710-9250-77CE897B6F82}
 	EndGlobalSection
 EndGlobal
