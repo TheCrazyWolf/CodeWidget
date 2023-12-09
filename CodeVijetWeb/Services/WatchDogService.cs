@@ -9,34 +9,48 @@ namespace CodeVijetWeb.Services;
  */
 public class WatchDogService : BackgroundService
 {
-    /* Путь для отслеживания */
+    /// <summary>
+    /// Текущий путь для отслеживания
+    /// </summary>
     private string _pathForTracking = "";
 
-    /* Таймер для службы */
+    /// <summary>
+    /// Ожидание задержки
+    /// для прошаривание файлов и обновление страниц с кодом
+    /// </summary>
     private readonly int _timeWait;
 
-    /*
-     * Черный контейнер для игнора
-     * чтобы за забивать всю оперативку и файлов и типов расширений файлов
-     */
+    /// <summary>
+    /// Черный список папок для игнора
+    /// TODO: необходимо вынести в конфиг файл
+    /// </summary>
     private readonly IEnumerable<string> _blackContainerPaths = new List<string>()
     {
         ".git", ".idea", "obj", "bin", ".vs"
     };
 
+    /// <summary>
+    /// Черный список расширений файлов для игнора
+    /// TODO: необходимо вынести в конфиг файл
+    /// </summary>
     private readonly IEnumerable<string> _blackContainerExtensions = new List<string>()
     {
         "exe", "db", "db-shm", "db-wal", "png", "ico", "jpg"
     };
 
-    /* Виджеты с кодом */
+    /// <summary>
+    /// Доступные виджеты с файлами для просмотра
+    /// </summary>
     private IList<ListingCode> _widgets = new List<ListingCode>();
 
     /* Теги для отслеживания файлов, которые можно прочитать */
     private readonly string _tagTrackCopyable;
     private readonly string _tagTrackNoCopyable;
 
-    /* Поле для доступа к конфиг файла */
+    /// <summary>
+    /// Внедрение DJ зависимостей и получение доступа
+    /// к конфигурационным файлам
+    /// </summary>
     private readonly IConfiguration _configuration;
 
     public WatchDogService(IConfiguration configuration)
@@ -48,9 +62,15 @@ public class WatchDogService : BackgroundService
         _tagTrackNoCopyable = _configuration.GetValue<string>("tagForTrackAndNoCopy") ?? "// nocopy";
         _timeWait = _configuration.GetValue<int>("TimerForFetchFiles");
 
+        // Запускаю сервис
+        // Мне кажется на этот моменте я что то делаю не так???
         Task.Run(() => ExecuteAsync(new CancellationToken()));
     }
 
+    /// <summary>
+    /// Фоновая служба, которая будет работать и работать
+    /// </summary>
+    /// <param name="stoppingToken"></param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -64,6 +84,10 @@ public class WatchDogService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Смена пути файла для отслеживания
+    /// </summary>
+    /// <param name="newPath"></param>
     public void ChangePathForTracking(string newPath)
     {
         /* Надо реализовать более адекватную проверку, пока что не до неё
@@ -71,6 +95,9 @@ public class WatchDogService : BackgroundService
         _pathForTracking = string.IsNullOrEmpty(newPath) ? _pathForTracking : newPath;
     }
 
+    /// <summary>
+    /// Проверка файлов и чтение
+    /// </summary>
     private void FetchFiles()
     {
         var pathProjects = Directory.EnumerateFiles(_pathForTracking, "*.*", SearchOption.AllDirectories)
@@ -117,13 +144,20 @@ public class WatchDogService : BackgroundService
         }
     }
 
-    /* Получение виджета по пути */
+    /// <summary>
+    /// Получение листинга
+    /// </summary>
+    /// <param name="fullPath">Полный путь к файлу</param>
+    /// <returns></returns>
     public ListingCode? GetCurrentWidget(string fullPath)
     {
         return _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
     }
 
-    /* Получение всех виджетов */
+    /// <summary>
+    /// Получение файлов доступных для просмотра
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<WidgetMenu> GetWidgets()
     {
         return _widgets.Select(widget => new WidgetMenu
