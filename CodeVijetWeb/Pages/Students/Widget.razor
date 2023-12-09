@@ -47,44 +47,56 @@
 {
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? PathWidget { get; set; } /* Путь до файла*/
+    public string? PathWidget { get; set; }
 
-    /* Текущий виджет */
+    /// <summary>
+    /// Текущий листинг
+    /// </summary>
     private ListingCode? _currentWidget;
 
-    private readonly Timer _timer = new() { Interval = 1000, Enabled = true };
+    /// <summary>
+    /// Экземпляр таймера
+    /// </summary>
+    private readonly Timer _timer = new()
+    {
+        Enabled = true
+    };
 
+    /// <summary>
+    /// Экземпляр библиотеки PRISM
+    /// </summary>
+    private readonly HtmlHighlighter _prism = new();
+
+    /// <summary>
+    /// Инициализация компонента, подклчение таймера
+    /// и привязка событий для обновлений листинга
+    /// </summary>
     protected override Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(PathWidget))
             return Task.CompletedTask;
-
+        
+        _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _currentWidget = WatchDog.GetCurrentWidget(PathWidget);
+            _currentWidget = WatchDog.GetListingCode(PathWidget);
             await InvokeAsync(StateHasChanged);
         };
 
         return Task.CompletedTask;
     }
 
-    /*
-     *  Рендерим подсвеченный код с помощью библиотеки
-     *  Prism
-     */
-
+    /// <summary>
+    /// Рендеринг красивого кода с подстветкой с помощью
+    /// библиотеки PRISM
+    /// </summary>
     private string RenderTokenizeFromPrism(string value)
-    {
-        var grammar = LanguageGrammars.CSharp;
-        var highlighter = new HtmlHighlighter();
-        var html = highlighter.Highlight(value, grammar, "html");
-        return html;
-    }
+        => _prism.Highlight(value, LanguageGrammars.CSharp, "html");
 
-    /*
-     * Рендеринг разрешающиего тега копировать или нет
-     */
-
+    /// <summary>
+    /// Рендеринг запрещающего тега для копирования листинга
+    /// </summary>
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
+    
 }

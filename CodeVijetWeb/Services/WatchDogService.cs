@@ -149,7 +149,7 @@ public class WatchDogService : BackgroundService
     /// </summary>
     /// <param name="fullPath">Полный путь к файлу</param>
     /// <returns></returns>
-    public ListingCode? GetCurrentWidget(string fullPath)
+    public ListingCode? GetListingCode(string fullPath)
     {
         return _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
     }
