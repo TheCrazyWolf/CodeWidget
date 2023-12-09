@@ -20,6 +20,7 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.css" />
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.js" />
+    <_ContentIncludedByDefault Remove="Pages\Egg\Egg.razor" />
   </ItemGroup>
 
   <ItemGroup>
