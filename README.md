@@ -14,7 +14,7 @@
 
 Соберите проект из исходников
 ```ps
-dotnet build
+dotnet publish -r win-x64 -c Release
 ```
 
 Настройкте appsetings.json:
