@@ -9,13 +9,74 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CodeVijetWeb.Migrations
 {
-    [DbContext(typeof(Sq_lite_Context))]
+    [DbContext(typeof(SqlDbContext))]
     partial class Sq_lite_ContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.14");
+
+            modelBuilder.Entity("CodeVijetWeb.DB.DLA.FileCode", b =>
+                {
+                    b.Property<int>("IdFileCode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("FileInSolutionIdFileSolution")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsCopyable")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("IdFileCode");
+
+                    b.HasIndex("FileInSolutionIdFileSolution");
+
+                    b.ToTable("FileCodes");
+                });
+
+            modelBuilder.Entity("CodeVijetWeb.DB.DLA.FileInSolution", b =>
+                {
+                    b.Property<int>("IdFileSolution")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ProjectIdProject")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdFileSolution");
+
+                    b.HasIndex("ProjectIdProject");
+
+                    b.ToTable("FileInSolutions");
+                });
+
+            modelBuilder.Entity("CodeVijetWeb.DB.DLA.Project", b =>
+                {
+                    b.Property<Guid>("IdProject")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocalFullPathSolution")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IdProject");
+
+                    b.ToTable("Projects");
+                });
 
             modelBuilder.Entity("CodeVijetWeb.DB.Logs", b =>
                 {
@@ -33,6 +94,24 @@ namespace CodeVijetWeb.Migrations
                     b.HasKey("LogsId");
 
                     b.ToTable("Logs");
+                });
+
+            modelBuilder.Entity("CodeVijetWeb.DB.DLA.FileCode", b =>
+                {
+                    b.HasOne("CodeVijetWeb.DB.DLA.FileInSolution", "FileInSolution")
+                        .WithMany()
+                        .HasForeignKey("FileInSolutionIdFileSolution");
+
+                    b.Navigation("FileInSolution");
+                });
+
+            modelBuilder.Entity("CodeVijetWeb.DB.DLA.FileInSolution", b =>
+                {
+                    b.HasOne("CodeVijetWeb.DB.DLA.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectIdProject");
+
+                    b.Navigation("Project");
                 });
 #pragma warning restore 612, 618
         }
