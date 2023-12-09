@@ -13,6 +13,6 @@ namespace CodeVijetWeb.DB
             optionsBuilder.UseSqlite("Filename=historyApp.db");
         }
 
-        public DbSet<Logs> Logs { get; set; }   
+        public DbSet<Log> Logs { get; set; }   
     }
 }

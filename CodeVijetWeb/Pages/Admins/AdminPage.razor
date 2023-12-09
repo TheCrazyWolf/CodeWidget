@@ -83,7 +83,7 @@ else
         
         try // сохраним в  бд  
         {
-            Ef.Logs.Add(new Logs { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
+            Ef.Logs.Add(new Log { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
             Ef.SaveChanges();
         }
         catch // да  пофиг 
