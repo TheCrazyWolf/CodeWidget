@@ -26,19 +26,13 @@ public class WatchDogService : BackgroundService
     /// Черный список папок для игнора
     /// TODO: необходимо вынести в конфиг файл
     /// </summary>
-    private readonly IEnumerable<string> _blackContainerPaths = new List<string>()
-    {
-        ".git", ".idea", "obj", "bin", ".vs"
-    };
+    private readonly IEnumerable<string> _blackContainerPaths;
 
     /// <summary>
     /// Черный список расширений файлов для игнора
     /// TODO: необходимо вынести в конфиг файл
     /// </summary>
-    private readonly IEnumerable<string> _blackContainerExtensions = new List<string>()
-    {
-        "exe", "db", "db-shm", "db-wal", "png", "ico", "jpg"
-    };
+    private readonly IEnumerable<string> _blackContainerExtensions;
 
     /// <summary>
     /// Доступные виджеты с файлами для просмотра
@@ -63,6 +57,8 @@ public class WatchDogService : BackgroundService
         _tagTrackCopyable = _configuration.GetValue<string>("tagForTrack") ?? "// track";
         _tagTrackNoCopyable = _configuration.GetValue<string>("tagForTrackAndNoCopy") ?? "// nocopy";
         _timeWait = _configuration.GetValue<int>("TimerForFetchFiles");
+        _blackContainerExtensions = _configuration.GetSection("BlackContainerExtensions").Get<List<string>>() ?? new List<string>();
+        _blackContainerPaths = _configuration.GetSection("BlackContainerPaths").Get<List<string>>() ?? new List<string>();
 
         // Запускаю сервис
         // Мне кажется на этот моменте я что то делаю не так???
@@ -82,7 +78,7 @@ public class WatchDogService : BackgroundService
             if (string.IsNullOrEmpty(_pathForTracking))
                 continue;
 
-            FetchFiles();
+            _widgets = FetchFiles();
         }
     }
 
@@ -100,15 +96,15 @@ public class WatchDogService : BackgroundService
     /// <summary>
     /// Проверка файлов и чтение
     /// </summary>
-    private void FetchFiles()
+    private IList<ListingCode> FetchFiles()
     {
         var pathProjects = Directory.EnumerateFiles(_pathForTracking, "*.*", SearchOption.AllDirectories)
             .Where(file => !_blackContainerPaths.Any(file.Contains) &&
                            !_blackContainerExtensions.Any(ext =>
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
             .ToArray();
-
-        _widgets = new List<ListingCode>();
+        
+        var widgets = new List<ListingCode>();
 
         foreach (var path in pathProjects)
         {
@@ -130,7 +126,7 @@ public class WatchDogService : BackgroundService
             if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
                 continue;
 
-            _widgets.Add(new ListingCode
+            widgets.Add(new ListingCode
             {
                 FullPath = path,
                 ShortPath = $"{path.Split(Path.DirectorySeparatorChar)
@@ -145,6 +141,8 @@ public class WatchDogService : BackgroundService
                 IdListingCode = GetUniqIdentity(path)
             });
         }
+
+        return widgets;
     }
 
     /// <summary>
