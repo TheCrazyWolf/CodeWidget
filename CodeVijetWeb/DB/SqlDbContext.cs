@@ -4,7 +4,8 @@ namespace CodeVijetWeb.DB
 {
     public class SqlDbContext : DbContext
     {
-
+        public DbSet<Log> Logs { get; set; }   
+        
         public SqlDbContext()
             => Database.MigrateAsync();
         
@@ -12,7 +13,6 @@ namespace CodeVijetWeb.DB
         {
             optionsBuilder.UseSqlite("Filename=historyApp.db");
         }
-
-        public DbSet<Log> Logs { get; set; }   
+        
     }
 }
