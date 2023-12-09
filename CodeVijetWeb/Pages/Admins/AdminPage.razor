@@ -8,8 +8,18 @@
 
 <PageTitle>Админ-панель</PageTitle>
 
+@* Обработка и вывод исключений на экран *@
+@if (!string.IsNullOrEmpty(_stringExceptionMessage))
+{
+    <div class="mt-2 mb-2 alert alert-danger" role="alert">
+        @_stringExceptionMessage
+    </div>
+}
+
 @if (_isAuthorized)
 {
+    @* Мини админ панель *@
+
     <h4 class="mt-4">Текущий проект для отслеживания</h4>
     <div class="card shadow-lg rounded">
         <div class="card-body">
@@ -38,6 +48,8 @@
 }
 else
 {
+    @* Экран входа *@
+    
     <div style="height: 95vh;" class="d-flex align-items-center justify-content-center">
         <div class="card shadow-lg rounded">
             <div class="card-body">
@@ -53,13 +65,30 @@ else
 
 
 @code {
-    private bool _isAuthorized = false;
 
+    /// <summary>
+    /// Хранение статуса, авторизован ли пользователь
+    /// </summary>
+    private bool _isAuthorized;
+
+    /// <summary>
+    /// Привязанное боле к Input для ввода пароля
+    /// </summary>
     private string _password = "";
+
+    /// <summary>
+    /// Привязанное боле к Input для ввода нового адреса к папке
+    /// </summary>
     private string _newPath = "";
 
-    /* Наитупейшая проверка, но пойдет */
+    /// <summary>
+    /// Сообщение об ошибке, исключений и т.д.
+    /// </summary>
+    private string _stringExceptionMessage = "";
 
+    /// <summary>
+    /// Проверяем пароль админа
+    /// </summary>
     private void CheckPassword()
     {
         if (Config.GetValue<string>("Password") != _password)
@@ -69,39 +98,53 @@ else
         StateHasChanged();
     }
 
-    /* Смена папки для отслеживания */
-
+    /// <summary>
+    /// Смена пути текущего проекта для отслеживания
+    /// </summary>
     private void ChangePathTracking()
     {
         if (!_isAuthorized)
             return;
 
         WatchDog.ChangePathForTracking(_newPath);
-        
-        if(string.IsNullOrEmpty(_newPath))
+
+        if (string.IsNullOrEmpty(_newPath))
             return;
-        
+
         try // сохраним в  бд  
         {
             Ef.Logs.Add(new Log { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
             Ef.SaveChanges();
         }
-        catch // да  пофиг 
+        catch (Exception e)
         {
+            _stringExceptionMessage = e.Message;
+            StateHasChanged();
         }
     }
 
 
-    /* старые  проекты */
-
+    /// <summary>
+    /// Возращает историю последних проектов из Базы данных
+    /// </summary>
     private List<string> GetHistoryApp()
     {
-        return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
+        try // сохраним в  бд  
+        {
+            return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
+        }
+        catch (Exception e)
+        {
+            _stringExceptionMessage = e.Message;
+            StateHasChanged();
+        }
+
+        return new List<string>();
     }
 
-
-    /* старые  проекты */
-
+    /// <summary>
+    /// Очистка историй проекта
+    /// </summary>
     private void ClearHistiry()
     {
         try // получим из бд
@@ -109,8 +152,10 @@ else
             Ef.Logs.RemoveRange(Ef.Logs);
             Ef.SaveChanges();
         }
-        catch
+        catch (Exception e)
         {
+            _stringExceptionMessage = e.Message;
+            StateHasChanged();
         }
     }
 
