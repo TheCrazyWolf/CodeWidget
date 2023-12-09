@@ -30,7 +30,7 @@ public class WatchDogService : BackgroundService
     };
 
     /* Виджеты с кодом */
-    private IList<CodeWidget> _widgets = new List<CodeWidget>();
+    private IList<ListingCode> _widgets = new List<ListingCode>();
 
     /* Теги для отслеживания файлов, которые можно прочитать */
     private readonly string _tagTrackCopyable;
@@ -79,7 +79,7 @@ public class WatchDogService : BackgroundService
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
             .ToArray();
 
-        _widgets = new List<CodeWidget>();
+        _widgets = new List<ListingCode>();
 
         foreach (var path in pathProjects)
         {
@@ -101,7 +101,7 @@ public class WatchDogService : BackgroundService
             if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
                 continue;
 
-            _widgets.Add(new CodeWidget
+            _widgets.Add(new ListingCode
             {
                 FullPath = path,
                 ShortPath = $"{path.Split(Path.DirectorySeparatorChar)
@@ -118,7 +118,7 @@ public class WatchDogService : BackgroundService
     }
 
     /* Получение виджета по пути */
-    public CodeWidget? GetCurrentWidget(string fullPath)
+    public ListingCode? GetCurrentWidget(string fullPath)
     {
         return _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
     }

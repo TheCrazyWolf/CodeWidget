@@ -1,6 +1,6 @@
 ﻿namespace CodeVijetWeb.Models;
 
-public class CodeWidget
+public class ListingCode
 {
     public string FileName { get; set; }
     public string FullPath { get; set; }
