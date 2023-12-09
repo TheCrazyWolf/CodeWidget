@@ -3,6 +3,11 @@
 public class WidgetMenu
 {
     /// <summary>
+    /// ID виджета на основе пути файла
+    /// </summary>
+    public string IdListingCode { get; set; }
+    
+    /// <summary>
     /// Полный путь файла на локальной машине (со стороны сервера)
     /// </summary>
     public string FullPath { get; set; }
@@ -14,4 +19,5 @@ public class WidgetMenu
     /// Короткий путь к файлу \Folder\MyFile.cs
     /// </summary>
     public string ShortPath { get; set; }
+    
 }
