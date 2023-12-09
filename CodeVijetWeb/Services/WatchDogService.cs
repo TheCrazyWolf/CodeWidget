@@ -150,10 +150,10 @@ public class WatchDogService : BackgroundService
     /// <summary>
     /// Получение листинга
     /// </summary>
-    /// <param name="fullPath">Полный путь к файлу</param>
+    /// <param name="idListing">Полный путь к файлу</param>
     /// <returns></returns>
-    public ListingCode? GetListingCode(string fullPath)
-        => _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
+    public ListingCode? GetListingCode(string idListing)
+        => _widgets.FirstOrDefault(widget => widget.IdListingCode == idListing);
 
     /// <summary>
     /// Получение файлов доступных для просмотра
