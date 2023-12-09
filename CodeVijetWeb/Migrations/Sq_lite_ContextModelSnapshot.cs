@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CodeVijetWeb.Migrations
 {
-    [DbContext(typeof(Sq_lite_Context))]
+    [DbContext(typeof(SqlDbContext))]
     partial class Sq_lite_ContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -17,7 +17,7 @@ namespace CodeVijetWeb.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.14");
 
-            modelBuilder.Entity("CodeVijetWeb.DB.Logs", b =>
+            modelBuilder.Entity("CodeVijetWeb.DB.Log", b =>
                 {
                     b.Property<int>("LogsId")
                         .ValueGeneratedOnAdd()

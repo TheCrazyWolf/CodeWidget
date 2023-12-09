@@ -20,10 +20,7 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.css" />
     <_ContentIncludedByDefault Remove="wwwroot\prismlb\prism.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="free-icon-food-waste-12184584.ico" />
+    <_ContentIncludedByDefault Remove="Pages\Egg\Egg.razor" />
   </ItemGroup>
 
   <ItemGroup>

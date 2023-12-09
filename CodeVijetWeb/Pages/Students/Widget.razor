@@ -8,74 +8,95 @@
 
 @inject WatchDogService WatchDog;
 
-@if (_currentWidget is not null)
-{
-    <div class="card shadow-lg rounded">
-        <div class="card-body">
+<PageTitle>Листинг</PageTitle>
+
+<div class="card shadow-lg rounded">
+    <div class="card-body">
+        @if (_currentWidget is not null)
+        {
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-        </div>
+        }
+        else
+        {
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
     </div>
+</div>
 
-    <div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
-        <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget.IsCopyable))">
+<div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
+    <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
             <code>
-                @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+    @if (_currentWidget is not null)
+    {
+        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+    }
+    else
+    {
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
             </code>
         </pre>
-    </div>
-}
-else
+</div>
+
+@code
 {
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-}
-
-
-@code {
-
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? PathWidget { get; set; } /* Путь до файла*/
+    public string? IdListing { get; set; }
 
-    /* Текущий виджет */
-    private CodeWidget? _currentWidget;
+    /// <summary>
+    /// Текущий листинг
+    /// </summary>
+    private ListingCode? _currentWidget;
 
-    private readonly Timer _timer = new() { Interval = 1000, Enabled = true };
+    /// <summary>
+    /// Экземпляр таймера
+    /// </summary>
+    private readonly Timer _timer = new()
+    {
+        Enabled = true
+    };
 
+    /// <summary>
+    /// Экземпляр библиотеки PRISM
+    /// </summary>
+    private readonly HtmlHighlighter _prism = new();
+
+    /// <summary>
+    /// Инициализация компонента, подклчение таймера
+    /// и привязка событий для обновлений листинга
+    /// </summary>
     protected override Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(PathWidget))
+        if (string.IsNullOrEmpty(IdListing))
             return Task.CompletedTask;
-
+        
+        _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _currentWidget = WatchDog.GetCurrentWidget(PathWidget);
+            _currentWidget = WatchDog.GetListingCode(IdListing);
             await InvokeAsync(StateHasChanged);
         };
 
         return Task.CompletedTask;
     }
 
-    /*
-     *  Рендерим подсвеченный код с помощью библиотеки
-     *  Prism
-     */
-
+    /// <summary>
+    /// Рендеринг красивого кода с подстветкой с помощью
+    /// библиотеки PRISM
+    /// </summary>
     private string RenderTokenizeFromPrism(string value)
-    {
-        var grammar = LanguageGrammars.CSharp;
-        var highlighter = new HtmlHighlighter();
-        var html = highlighter.Highlight(value, grammar, "html");
-        return html;
-    }
+        => _prism.Highlight(value, LanguageGrammars.CSharp, "html");
 
-    /*
-     * Рендеринг разрешающиего тега копировать или нет
-     */
-
+    /// <summary>
+    /// Рендеринг запрещающего тега для копирования листинга
+    /// </summary>
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
-
+    
 }

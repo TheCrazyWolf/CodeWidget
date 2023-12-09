@@ -17,7 +17,7 @@ builder.WebHost.ConfigureKestrel(
     options => options.ListenAnyIP(builder.Configuration.GetValue<int>("HostPort")));
 
 /* Добавление Контекста подключения в завимости */
-builder.Services.AddDbContext<Sq_lite_Context>();
+builder.Services.AddDbContext<SqlDbContext>();
 
 var app = builder.Build();
 
