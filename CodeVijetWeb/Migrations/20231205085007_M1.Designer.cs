@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CodeVijetWeb.Migrations
 {
-    [DbContext(typeof(Sq_lite_Context))]
+    [DbContext(typeof(SqlDbContext))]
     [Migration("20231205085007_M1")]
     partial class M1
     {

@@ -2,10 +2,10 @@
 
 namespace CodeVijetWeb.DB
 {
-    public class Sq_lite_Context : DbContext
+    public class SqlDbContext : DbContext
     {
 
-        public Sq_lite_Context()
+        public SqlDbContext()
             => Database.MigrateAsync();
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
