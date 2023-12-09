@@ -1,4 +1,6 @@
-﻿using CodeVijetWeb.Models;
+﻿using System.Security.Cryptography;
+using System.Text;
+using CodeVijetWeb.Models;
 
 namespace CodeVijetWeb.Services;
 
@@ -139,7 +141,8 @@ public class WatchDogService : BackgroundService
                 Code = content.Replace(_tagTrackCopyable, string.Empty)
                     .Replace(_tagTrackNoCopyable, string.Empty),
                 FileName = Path.GetFileName(path),
-                IsCopyable = content.Contains(_tagTrackCopyable)
+                IsCopyable = content.Contains(_tagTrackCopyable),
+                IdListingCode = GetUniqIdentity(path)
             });
         }
     }
@@ -150,9 +153,7 @@ public class WatchDogService : BackgroundService
     /// <param name="fullPath">Полный путь к файлу</param>
     /// <returns></returns>
     public ListingCode? GetListingCode(string fullPath)
-    {
-        return _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
-    }
+        => _widgets.FirstOrDefault(widget => widget.FullPath == fullPath);
 
     /// <summary>
     /// Получение файлов доступных для просмотра
@@ -164,7 +165,8 @@ public class WatchDogService : BackgroundService
         {
             FullPath = widget.FullPath,
             FileName = widget.FileName,
-            ShortPath = widget.ShortPath
+            ShortPath = widget.ShortPath,
+            IdListingCode = widget.IdListingCode
         });
     }
 
@@ -174,4 +176,16 @@ public class WatchDogService : BackgroundService
     /// <returns></returns>
     public int GetTimeWaitFromConfig()
         => _timeWait;
+
+    /// <summary>
+    /// Генерация ID на основе строки с полным путем
+    /// </summary>
+    /// <returns></returns>
+    private string GetUniqIdentity(string fullPath)
+    {
+        using var md5 = MD5.Create();
+        var inputBytes = Encoding.ASCII.GetBytes(fullPath);
+        var hashBytes = md5.ComputeHash(inputBytes);
+        return Convert.ToHexString(hashBytes).ToLower(); // .NET 5 +
+    }
 }
