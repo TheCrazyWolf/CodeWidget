@@ -33,16 +33,21 @@
 </div>
 
 @code {
+   
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private Timer _timer = new() { Interval = 1000, Enabled = true, };
+    private Timer _timer = new()
+    {
+        Enabled = true,
+    };
 
     private IEnumerable<WidgetMenu> _widgetMenus = new List<WidgetMenu>();
 
     protected override void OnInitialized()
     {
+        _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
             _widgetMenus = WatchDog.GetWidgets();
@@ -51,13 +56,9 @@
     }
 
     private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+        => collapseNavMenu = !collapseNavMenu;
 
     private void OpenWidget(WidgetMenu widgetMenu)
-    {
-        Navigation.NavigateTo($"/widget?IdListing={widgetMenu.IdListingCode}");
-    }
-    
+        => Navigation.NavigateTo($"/widget?IdListing={widgetMenu.IdListingCode}");
+
 }
