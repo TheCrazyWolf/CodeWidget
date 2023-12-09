@@ -47,7 +47,7 @@
 {
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? PathWidget { get; set; }
+    public string? IdListing { get; set; }
 
     /// <summary>
     /// Текущий листинг
@@ -73,13 +73,13 @@
     /// </summary>
     protected override Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(PathWidget))
+        if (string.IsNullOrEmpty(IdListing))
             return Task.CompletedTask;
         
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _currentWidget = WatchDog.GetListingCode(PathWidget);
+            _currentWidget = WatchDog.GetListingCode(IdListing);
             await InvokeAsync(StateHasChanged);
         };
 
