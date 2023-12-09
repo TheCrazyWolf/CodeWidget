@@ -167,4 +167,11 @@ public class WatchDogService : BackgroundService
             ShortPath = widget.ShortPath
         });
     }
+
+    /// <summary>
+    /// Получение время задержки обновления файлов
+    /// </summary>
+    /// <returns></returns>
+    public int GetTimeWaitFromConfig()
+        => _timeWait;
 }
