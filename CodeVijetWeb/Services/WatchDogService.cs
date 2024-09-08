@@ -14,7 +14,7 @@ public class WatchDogService : BackgroundService
     /// <summary>
     /// Текущий путь для отслеживания
     /// </summary>
-    private string _pathForTracking = "";
+    public string PathForTracking { get; set; } = "";
 
     /// <summary>
     /// Ожидание задержки
@@ -75,7 +75,7 @@ public class WatchDogService : BackgroundService
         {
             await Task.Delay(_timeWait, stoppingToken);
 
-            if (string.IsNullOrEmpty(_pathForTracking))
+            if (string.IsNullOrEmpty(PathForTracking))
                 continue;
 
             _widgets = FetchFiles();
@@ -90,7 +90,7 @@ public class WatchDogService : BackgroundService
     {
         /* Надо реализовать более адекватную проверку, пока что не до неё
          */
-        _pathForTracking = string.IsNullOrEmpty(newPath) ? _pathForTracking : newPath;
+        PathForTracking = string.IsNullOrEmpty(newPath) ? PathForTracking : newPath;
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class WatchDogService : BackgroundService
     /// </summary>
     private IList<ListingCode> FetchFiles()
     {
-        var pathProjects = Directory.EnumerateFiles(_pathForTracking, "*.*", SearchOption.AllDirectories)
+        var pathProjects = Directory.EnumerateFiles(PathForTracking, "*.*", SearchOption.AllDirectories)
             .Where(file => !_blackContainerPaths.Any(file.Contains) &&
                            !_blackContainerExtensions.Any(ext =>
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
@@ -186,4 +186,5 @@ public class WatchDogService : BackgroundService
         var hashBytes = md5.ComputeHash(inputBytes);
         return Convert.ToHexString(hashBytes).ToLower(); // .NET 5 +
     }
+    
 }

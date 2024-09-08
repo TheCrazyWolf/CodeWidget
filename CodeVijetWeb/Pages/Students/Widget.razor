@@ -40,12 +40,21 @@
 }
 else
 {
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" Style="margin: 15px;" />
 }
 
 @code
 {
-    [Parameter] [SupplyParameterFromQuery] public string? Id { get; set; }
+    private string? _id;
+    [Parameter] [SupplyParameterFromQuery] public string? Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            _currentWidget = null;
+        }
+    }
 
     /// <summary>
     /// Текущий листинг
@@ -55,13 +64,13 @@ else
     /// <summary>
     /// Экземпляр таймера
     /// </summary>
-    private readonly Timer _timer = new()
+    private readonly Timer _timer = new Timer
     {
         Enabled = true
     };
 
-    private bool _isLongInactive = false;
-    private readonly Timer _timeOnDead = new()
+    private bool _isLongInactive;
+    private readonly Timer _timeOnDead = new Timer
     {
         Enabled = true,
         Interval = 5000,
@@ -70,17 +79,19 @@ else
     /// <summary>
     /// Экземпляр библиотеки PRISM
     /// </summary>
-    private readonly HtmlHighlighter _prism = new();
+    private readonly HtmlHighlighter _prism = new HtmlHighlighter();
 
     /// <summary>
     /// Инициализация компонента, подклчение таймера
     /// и привязка событий для обновлений листинга
     /// </summary>
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(Id))
-            return Task.CompletedTask;
+            return;
 
+        await InvokeAsync(StateHasChanged);
+        
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
@@ -90,11 +101,12 @@ else
 
         _timeOnDead.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _isLongInactive = true;
+            if(_currentWidget is null)
+                _isLongInactive = true;
+            
             await InvokeAsync(StateHasChanged);
         };
         
-        return Task.CompletedTask;
     }
 
     /// <summary>

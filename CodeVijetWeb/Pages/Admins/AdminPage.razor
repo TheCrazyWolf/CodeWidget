@@ -20,37 +20,58 @@
 {
     @* Мини админ панель *@
 
-    <h4 class="mt-4">Текущий проект для отслеживания</h4>
-    <div class="card shadow-lg rounded">
+    @if (string.IsNullOrEmpty(WatchDog.PathForTracking))
+    {
+        <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Warning">Сейчас не ведется трансляция кода</MudAlert>
+    }
+    else
+    {
+        <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Info">Сейчас транслируется код из директории: @WatchDog.PathForTracking
+            <br/><MudButton Class="mt-2" Size="Size.Small" OnClick="StopService" Variant="Variant.Outlined" Color="Color.Error">Остановить</MudButton>
+            </MudAlert>
+    }
+    
+    <MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Новый проект для отслеживания</MudText>
+    <div class="card rounded">
         <div class="card-body">
-            <label>Путь до папки с проектом для отслеживания</label>
-            <div class="mt-2 d-flex">
-                <input @bind="_newPath" type="text" class="form-control" placeholder="C:\Users\kulagin\RiderProjects\Api-Client-for-samgk.ru">
-                <button @onclick="ChangePathTracking" type="button" class="ms-2 btn btn-primary">Сохранить</button>
-            </div>
+            <MudStack Row="true">
+                <MudTextField @bind-value="_newPath" T="string"
+                              FullWidth="true" Label="Системный путь" 
+                              Variant="Variant.Text">
+                </MudTextField>
+                <MudButton OnClick="ChangePathTracking" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
+
+            </MudStack>
         </div>
     </div>
 
-    <div class="mt-4">
-        <h4>Последние проекты:</h4>
-    </div>
-    foreach (var item in GetHistoryApp())
+
+    <MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Последние проекты</MudText>
+    @foreach (var item in GetHistoryApp())
     {
-        <div class="mt-4 card shadow-sm rounded">
+        <div class="mt-2 card rounded">
             <div class="card-body">
-                <input readonly type="text" value="@item" class="form-control">
+                <MudTextField Value="item.Path" T="string"
+                              ReadOnly="true"
+                              FullWidth="true"
+                              Label="@item.Date.ToString()" Variant="Variant.Text">
+                </MudTextField>
+                <br/>
+                <MudStack Row="true">
+                    <MudButton OnClick="() => ChangePathTracking(item)" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
+                    <MudButton OnClick="() => RemoveFromHistory(item)" Variant="Variant.Outlined" Color="Color.Error">Удалить</MudButton>
+                </MudStack>
             </div>
         </div>
     }
-    <div class="mt-4">
-        <button @onclick="ClearHistiry" class="btn btn-primary">Очистить историю</button>
-    </div>
+    
+    <MudButton Class="mt-2" OnClick="ClearHistiry" Variant="Variant.Outlined" Color="Color.Error">Очистить историю</MudButton>
 }
 else
 {
     @* Экран входа *@
-    
-    <div style="height: 95vh;" class="d-flex align-items-center justify-content-center">
+
+    <div style="height: 100%;" class="d-flex align-items-center justify-content-center">
         <div class="card shadow-lg rounded">
             <div class="card-body">
                 <label>Введите админ-пароль</label>
@@ -113,7 +134,11 @@ else
 
         try // сохраним в  бд  
         {
-            Ef.Logs.Add(new Log { Date = DateOnly.FromDateTime(DateTime.Now), Path = _newPath });
+            Ef.Logs.Add(new Log
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Path = _newPath
+            });
             Ef.SaveChanges();
         }
         catch (Exception e)
@@ -123,25 +148,23 @@ else
         }
     }
 
+    private void ChangePathTracking(Log newValue)
+    {
+        if (!_isAuthorized)
+            return;
+
+        WatchDog.ChangePathForTracking(newValue.Path);
+    }
+
     /// <summary>
     /// Возращает историю последних проектов из Базы данных
     /// </summary>
-    private List<string> GetHistoryApp()
+    private List<Log> GetHistoryApp()
     {
         if (!_isAuthorized)
-            return new List<string>();
-        
-        try // сохраним в  бд  
-        {
-            return Ef.Logs.OrderByDescending(d => d.Date).Select(x => x.Path).Distinct().ToList();
-        }
-        catch (Exception e)
-        {
-            _stringExceptionMessage = e.Message;
-            StateHasChanged();
-        }
+            return [];
 
-        return new List<string>();
+        return Ef.Logs.OrderByDescending(d => d.Date).Distinct().ToList();
     }
 
     /// <summary>
@@ -151,7 +174,7 @@ else
     {
         if (!_isAuthorized)
             return;
-        
+
         try // получим из бд
         {
             Ef.Logs.RemoveRange(Ef.Logs);
@@ -162,6 +185,17 @@ else
             _stringExceptionMessage = e.Message;
             StateHasChanged();
         }
+    }
+
+    private async Task RemoveFromHistory(Log item)
+    {
+        Ef.Remove(item);
+        await Ef.SaveChangesAsync();
+    }
+
+    private void StopService()
+    {
+        WatchDog.PathForTracking = string.Empty;
     }
 
 }
