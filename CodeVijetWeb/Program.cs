@@ -1,5 +1,6 @@
 using CodeVijetWeb.DB;
 using CodeVijetWeb.Services;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -18,6 +19,7 @@ builder.WebHost.ConfigureKestrel(
 
 /* Добавление Контекста подключения в завимости */
 builder.Services.AddDbContext<SqlDbContext>();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
