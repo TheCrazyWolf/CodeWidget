@@ -10,44 +10,42 @@
 
 <PageTitle>Листинг</PageTitle>
 
-<div class="card shadow-lg rounded">
-    <div class="card-body">
-        @if (_currentWidget is not null)
-        {
+@if (_isLongInactive)
+{
+    <MudAlert Severity="Severity.Error">Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.  
+        <br/>
+        <MudButton Class="mt-2" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
+    </MudAlert>
+}
+
+@if (_currentWidget != null)
+{
+    <div class="card rounded">
+        <div class="card-body">
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-        }
-        else
-        {
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        }
-    </div>
-</div>
-
-<div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
-    <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
-            <code>
-    @if (_currentWidget is not null)
-    {
-        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
-    }
-    else
-    {
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
         </div>
-    }
+    </div>
+
+    <div style="height: 68vh;" class="mt-4 card rounded">
+        <pre style="height: 80vh; white-space: pre-wrap;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
+            <code>
+                @if (_currentWidget != null)
+                {
+                    @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+                }
             </code>
         </pre>
-</div>
+    </div>
+}
+else
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+}
 
 @code
 {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string? Id { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public string? Id { get; set; }
 
     /// <summary>
     /// Текущий листинг
@@ -60,6 +58,13 @@
     private readonly Timer _timer = new()
     {
         Enabled = true
+    };
+
+    private bool _isLongInactive = false;
+    private readonly Timer _timeOnDead = new()
+    {
+        Enabled = true,
+        Interval = 5000,
     };
 
     /// <summary>
@@ -75,7 +80,7 @@
     {
         if (string.IsNullOrEmpty(Id))
             return Task.CompletedTask;
-        
+
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
@@ -83,6 +88,12 @@
             await InvokeAsync(StateHasChanged);
         };
 
+        _timeOnDead.Elapsed += async (object? sender, ElapsedEventArgs e) =>
+        {
+            _isLongInactive = true;
+            await InvokeAsync(StateHasChanged);
+        };
+        
         return Task.CompletedTask;
     }
 
@@ -98,5 +109,7 @@
     /// </summary>
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
+
+    
     
 }
