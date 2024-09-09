@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CodeVijetWeb.Migrations
 {
     [DbContext(typeof(SqlDbContext))]
-    partial class Sq_lite_ContextModelSnapshot : ModelSnapshot
+    partial class SqlDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
