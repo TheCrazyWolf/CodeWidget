@@ -32,7 +32,7 @@
     }
     
     <MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Новый проект для отслеживания</MudText>
-    <div class="card rounded">
+    <div style="border-color: #0c4128" class="card rounded">
         <div class="card-body">
             <MudStack Row="true">
                 <MudTextField @bind-value="_newPath" T="string"
@@ -65,7 +65,7 @@
         </div>
     }
     
-    <MudButton Class="mt-2" OnClick="ClearHistiry" Variant="Variant.Outlined" Color="Color.Error">Очистить историю</MudButton>
+    <MudButton Class="mt-2" OnClick="ClearHistory" Variant="Variant.Outlined" Color="Color.Error">Очистить историю</MudButton>
 }
 else
 {
@@ -124,34 +124,22 @@ else
     /// </summary>
     private void ChangePathTracking()
     {
-        if (!_isAuthorized)
-            return;
+        if (!_isAuthorized || string.IsNullOrEmpty(_newPath)) return;
 
         WatchDog.ChangePathForTracking(_newPath);
-
-        if (string.IsNullOrEmpty(_newPath))
-            return;
-
-        try // сохраним в  бд  
+        
+        Ef.Logs.Add(new Log
         {
-            Ef.Logs.Add(new Log
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Path = _newPath
-            });
-            Ef.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            _stringExceptionMessage = e.Message;
-            StateHasChanged();
-        }
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            Path = _newPath
+        });
+        Ef.SaveChanges();
+        StateHasChanged();
     }
 
     private void ChangePathTracking(Log newValue)
     {
-        if (!_isAuthorized)
-            return;
+        if (!_isAuthorized) return;
 
         WatchDog.ChangePathForTracking(newValue.Path);
     }
@@ -161,8 +149,7 @@ else
     /// </summary>
     private List<Log> GetHistoryApp()
     {
-        if (!_isAuthorized)
-            return [];
+        if (!_isAuthorized) return [];
 
         return Ef.Logs.OrderByDescending(d => d.Date).Distinct().ToList();
     }
@@ -170,21 +157,14 @@ else
     /// <summary>
     /// Очистка историй проекта
     /// </summary>
-    private void ClearHistiry()
+    private void ClearHistory()
     {
         if (!_isAuthorized)
             return;
-
-        try // получим из бд
-        {
-            Ef.Logs.RemoveRange(Ef.Logs);
-            Ef.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            _stringExceptionMessage = e.Message;
-            StateHasChanged();
-        }
+        
+        Ef.Logs.RemoveRange(Ef.Logs);
+        Ef.SaveChanges();
+        StateHasChanged();
     }
 
     private async Task RemoveFromHistory(Log item)
