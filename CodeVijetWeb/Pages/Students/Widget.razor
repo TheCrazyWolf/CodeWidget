@@ -103,7 +103,6 @@ else
         {
             if(_currentWidget is null)
                 _isLongInactive = true;
-            
             await InvokeAsync(StateHasChanged);
         };
         
@@ -121,7 +120,5 @@ else
     /// </summary>
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
-
-    
     
 }
