@@ -76,7 +76,9 @@ public class WatchDogService : BackgroundService
             await Task.Delay(_timeWait, stoppingToken);
 
             if (string.IsNullOrEmpty(PathForTracking))
-                continue;
+            {
+                _widgets = new List<ListingCode>(); continue;
+            }
 
             _widgets = FetchFiles();
         }
