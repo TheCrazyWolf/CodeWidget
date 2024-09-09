@@ -5,40 +5,29 @@
     CodeWidget
 </PageTitle>
 
-<div class="card shadow-lg rounded">
-    <div class="card-body">
-        <h4>Добро пожаловать!</h4>
-    </div>
-</div>
+<MudAlert Class="mb-4" Severity="Severity.Info">Версия: Ну вроде работает
+    <MudStack Class="mt-4" Row="true">
+        <MudButton Href="https://github.com/frakiec89"
+                   Target="_blank"
+                   Variant="Variant.Text"
+                   EndIcon="@Icons.Custom.Brands.GitHub"
+                   Color="Color.Secondary"
+                   Style="text-transform:none">
+            frakiec89
+        </MudButton>
 
-<div class="mt-4 card shadow-lg rounded">
-    <div class="card-body">
-        <h4>Небольшая инструкция</h4>
-        <ul class="mt-4">
-            <li>В этом веб-приложении будут отображаться листинги файлов проекта преподавателя</li>
-            <li>Сбоку в меню, у вас будет отображаться список доступных файла для просмотра</li>
-            <li>Листинги обновляются в реальном режиме (почти). Напоминайте преподавателю нажимать CTRL+S чаще</li>
-        </ul>
-    </div>
-</div>
+        <MudButton Href="https://github.com/TheCrazyWolf"
+                   Target="_blank"
+                   Variant="Variant.Text"
+                   EndIcon="@Icons.Custom.Brands.GitHub"
+                   Color="Color.Info"
+                   Style="text-transform:none">
+            TheCrazyWolf
+        </MudButton>
+    </MudStack>
+</MudAlert>
 
-<div class="mt-4 card shadow-lg rounded">
-    <div class="card-body">
-        <img src="source/CatCode.gif" alt="Error"/>
-    </div>
-</div>
-
-<div class="mt-4 card shadow-lg rounded">
-    <div class="card-body">
-        <a href="https://github.com/frakiec89">frakiec89</a> and <a href="https://github.com/TheCrazyWolf">TheCrazyWolf</a>
-    </div>
-</div>
-
-<div class="mt-4 card shadow-lg rounded">
-    <div class="card-body">
-        <span>Версия: Ну вроде рабьотает, пока что</span>
-    </div>
-</div>
+<MudImage Src="source/CatCode.gif"></MudImage>
 
 @code{
 }

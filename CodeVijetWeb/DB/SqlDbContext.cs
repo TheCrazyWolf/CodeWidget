@@ -1,18 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace CodeVijetWeb.DB
+namespace CodeVijetWeb.DB;
+
+public sealed class SqlDbContext : DbContext
 {
-    public class SqlDbContext : DbContext
+    public DbSet<Log> Logs { get; set; }
+
+    public SqlDbContext()
+        => Database.MigrateAsync();
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        public DbSet<Log> Logs { get; set; }   
-        
-        public SqlDbContext()
-            => Database.MigrateAsync();
-        
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Filename=historyApp.db");
-        }
-        
+        optionsBuilder.UseSqlite("Data Source = app.db");
     }
 }

@@ -10,44 +10,51 @@
 
 <PageTitle>Листинг</PageTitle>
 
-<div class="card shadow-lg rounded">
-    <div class="card-body">
-        @if (_currentWidget is not null)
-        {
+@if (_isLongInactive)
+{
+    <MudAlert Severity="Severity.Error">Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.  
+        <br/>
+        <MudButton Class="mt-2" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
+    </MudAlert>
+}
+
+@if (_currentWidget != null)
+{
+    <div class="card rounded">
+        <div class="card-body">
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-        }
-        else
-        {
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        }
-    </div>
-</div>
-
-<div style="height: 80vh;" class="mt-4 card shadow-lg rounded">
-    <pre style="height: 80vh;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
-            <code>
-    @if (_currentWidget is not null)
-    {
-        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
-    }
-    else
-    {
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
         </div>
-    }
+    </div>
+
+    <div style="height: 68vh;" class="mt-4 card rounded">
+        <pre style="height: 80vh; white-space: pre-wrap;" class="m-0 language-csharp @((MarkupString)RenderNoCopyClass(_currentWidget is null || _currentWidget.IsCopyable))">
+            <code>
+                @if (_currentWidget != null)
+                {
+                    @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+                }
             </code>
         </pre>
-</div>
+    </div>
+}
+else
+{
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" Style="margin: 15px;" />
+}
 
 @code
 {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string? IdListing { get; set; }
+    private string? _id;
+    [Parameter] [SupplyParameterFromQuery] public string? Id
+    {
+        get => _id;
+        set
+        {
+            _id = value;
+            _currentWidget = null;
+        }
+    }
 
     /// <summary>
     /// Текущий листинг
@@ -57,33 +64,48 @@
     /// <summary>
     /// Экземпляр таймера
     /// </summary>
-    private readonly Timer _timer = new()
+    private readonly Timer _timer = new Timer
     {
         Enabled = true
+    };
+
+    private bool _isLongInactive;
+    private readonly Timer _timeOnDead = new Timer
+    {
+        Enabled = true,
+        Interval = 5000,
     };
 
     /// <summary>
     /// Экземпляр библиотеки PRISM
     /// </summary>
-    private readonly HtmlHighlighter _prism = new();
+    private readonly HtmlHighlighter _prism = new HtmlHighlighter();
 
     /// <summary>
     /// Инициализация компонента, подклчение таймера
     /// и привязка событий для обновлений листинга
     /// </summary>
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(IdListing))
-            return Task.CompletedTask;
+        if (string.IsNullOrEmpty(Id))
+            return;
+
+        await InvokeAsync(StateHasChanged);
         
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            _currentWidget = WatchDog.GetListingCode(IdListing);
+            _currentWidget = WatchDog.GetListingCode(Id);
             await InvokeAsync(StateHasChanged);
         };
 
-        return Task.CompletedTask;
+        _timeOnDead.Elapsed += async (object? sender, ElapsedEventArgs e) =>
+        {
+            if(_currentWidget is null)
+                _isLongInactive = true;
+            await InvokeAsync(StateHasChanged);
+        };
+        
     }
 
     /// <summary>

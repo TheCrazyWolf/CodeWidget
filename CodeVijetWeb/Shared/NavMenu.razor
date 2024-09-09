@@ -5,40 +5,24 @@
 @inject WatchDogService WatchDog;
 @inject NavigationManager Navigation;
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">WidgetCode</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Админ панель
-            </NavLink>
-        </div>
+<MudPaper Style="background-color: #e3eaf2;" Width="300px" Elevation="0">
+    <MudNavMenu Rounded="true" Margin="Margin.Dense" Class="pa-2">
+        <MudNavLink Href="/index" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+        <MudNavLink Href="/admin" Icon="@Icons.Material.Filled.Science">Админ панель</MudNavLink>
         @foreach (var menu in _widgetMenus)
         {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" role='button' Match="NavLinkMatch.All" @onclick="() => OpenWidget(menu)">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span> @menu.ShortPath
-                </NavLink>
-            </div>
+            <MudNavLink Href="@GetUrl(menu)" Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.Code">@menu.ShortPath
+            </MudNavLink>
         }
-    </nav>
-</div>
+    </MudNavMenu>
+</MudPaper>
+
 
 @code {
-   
-    private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private Timer _timer = new()
+    private Timer _timer = new Timer
     {
         Enabled = true,
     };
@@ -55,10 +39,8 @@
         };
     }
 
-    private void ToggleNavMenu()
-        => collapseNavMenu = !collapseNavMenu;
-
-    private void OpenWidget(WidgetMenu widgetMenu)
-        => Navigation.NavigateTo($"/widget?IdListing={widgetMenu.IdListingCode}");
-
+    protected string GetUrl(WidgetMenu widgetMenu)
+    {
+        return $"/widget?id={widgetMenu.IdListingCode}";
+    }
 }
