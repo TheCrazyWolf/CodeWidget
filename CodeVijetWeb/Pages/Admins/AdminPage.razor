@@ -1,131 +1,76 @@
 ﻿@page "/admin"
+
 @using Blazored.LocalStorage
 @using CodeVijetWeb.DB;
 @using CodeVijetWeb.Services
 
 @inject IConfiguration Config;
+@inject NavigationManager Navigation;
 @inject ILocalStorageService Storage;
 @inject WatchDogService WatchDog;
 @inject SqlDbContext Ef;
 
 <PageTitle>Админ-панель</PageTitle>
 
-@* Обработка и вывод исключений на экран *@
-@if (!string.IsNullOrEmpty(_stringExceptionMessage))
+@if (string.IsNullOrEmpty(WatchDog.PathForTracking))
 {
-    <div class="mt-2 mb-2 alert alert-danger" role="alert">
-        @_stringExceptionMessage
-    </div>
-}
-
-@if (_isAuthorized)
-{
-    @* Мини админ панель *@
-
-    @if (string.IsNullOrEmpty(WatchDog.PathForTracking))
-    {
-        <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Warning">Сейчас не ведется трансляция кода</MudAlert>
-    }
-    else
-    {
-        <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Info">Сейчас транслируется код из директории: @WatchDog.PathForTracking
-            <br/><MudButton Class="mt-2" Size="Size.Small" OnClick="StopService" Variant="Variant.Outlined" Color="Color.Error">Остановить</MudButton>
-            </MudAlert>
-    }
-    
-    <MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Новый проект для отслеживания</MudText>
-    <div style="border-color: #0c4128" class="card rounded">
-        <div class="card-body">
-            <MudStack Row="true">
-                <MudTextField @bind-value="_newPath" T="string"
-                              FullWidth="true" Label="Системный путь" 
-                              Variant="Variant.Text">
-                </MudTextField>
-                <MudButton OnClick="ChangePathTracking" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
-
-            </MudStack>
-        </div>
-    </div>
-
-
-    <MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Последние проекты</MudText>
-    @foreach (var item in GetHistoryApp())
-    {
-        <div class="mt-2 card rounded">
-            <div class="card-body">
-                <MudTextField Value="item.Path" T="string"
-                              ReadOnly="true"
-                              FullWidth="true"
-                              Label="@item.Date.ToString()" Variant="Variant.Text">
-                </MudTextField>
-                <br/>
-                <MudStack Row="true">
-                    <MudButton OnClick="() => ChangePathTracking(item)" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
-                    <MudButton OnClick="() => RemoveFromHistory(item)" Variant="Variant.Outlined" Color="Color.Error">Удалить</MudButton>
-                </MudStack>
-            </div>
-        </div>
-    }
-    
-    <MudButton Class="mt-2" OnClick="ClearHistory" Variant="Variant.Outlined" Color="Color.Error">Очистить историю</MudButton>
+    <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Warning">Сейчас не ведется трансляция кода</MudAlert>
 }
 else
 {
-    @* Экран входа *@
+    <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Info">
+        Сейчас транслируется код из директории: @WatchDog.PathForTracking
+        <br/><MudButton Class="mt-2" Size="Size.Small" OnClick="StopService" Variant="Variant.Outlined" Color="Color.Error">Остановить</MudButton>
+    </MudAlert>
+}
 
-    <div style="height: 100%;" class="d-flex align-items-center justify-content-center">
-        <div class="card shadow-lg rounded">
-            <div class="card-body">
-                <label>Введите админ-пароль</label>
-                <div class="mt-2 d-flex">
-                    <input @bind="_password" type="password" class="form-control" placeholder="Пароль">
-                    <button @onclick="CheckPassword" type="button" class="ms-2 btn btn-primary">Войти</button>
-                </div>
-            </div>
+<MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Новый проект для отслеживания</MudText>
+<div style="border-color: #0c4128" class="card rounded">
+    <div class="card-body">
+        <MudStack Row="true">
+            <MudTextField @bind-value="_newPath" T="string"
+                          FullWidth="true" Label="Системный путь"
+                          Variant="Variant.Text">
+            </MudTextField>
+            <MudButton OnClick="ChangePathTracking" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
+        </MudStack>
+    </div>
+</div>
+
+<MudText Class="mt-5" Typo="Typo.button" HtmlTag="h3">Последние проекты</MudText>
+@foreach (var item in GetHistoryApp())
+{
+    <div class="mt-2 card rounded">
+        <div class="card-body">
+            <MudTextField Value="item.Path" T="string"
+                          ReadOnly="true"
+                          FullWidth="true"
+                          Label="@item.Date.ToString()" Variant="Variant.Text">
+            </MudTextField>
+            <br/>
+            <MudStack Row="true">
+                <MudButton OnClick="() => ChangePathTracking(item)" Variant="Variant.Outlined" Color="Color.Info">Транслировать</MudButton>
+                <MudButton OnClick="() => RemoveFromHistory(item)" Variant="Variant.Outlined" Color="Color.Error">Удалить</MudButton>
+            </MudStack>
         </div>
     </div>
 }
 
+<MudButton Class="mt-2" OnClick="ClearHistory" Variant="Variant.Outlined" Color="Color.Error">Очистить историю</MudButton>
 
 @code {
-
-    /// <summary>
-    /// Хранение статуса, авторизован ли пользователь
-    /// </summary>
-    private bool _isAuthorized;
-
-    /// <summary>
-    /// Привязанное боле к Input для ввода пароля
-    /// </summary>
-    private string _password = "";
-
+    
     /// <summary>
     /// Привязанное боле к Input для ввода нового адреса к папке
     /// </summary>
     private string _newPath = "";
-
-    /// <summary>
-    /// Сообщение об ошибке, исключений и т.д.
-    /// </summary>
-    private string _stringExceptionMessage = "";
-
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _password = await Storage.GetItemAsync<string>("Password") ?? string.Empty;
-        CheckPassword();
-    }
-
-    /// <summary>
-    /// Проверяем пароль админа
-    /// </summary>
-    private void CheckPassword()
-    {
-        if (Config.GetValue<string>("Password") != _password) return;
-
-        _isAuthorized = true;
-        Storage.SetItemAsync("Password", _password);
-        StateHasChanged();
+        if (!firstRender) return;
+        
+        if (Config.GetValue<string>("Password") != await Storage.GetItemAsync<string>("Password"))
+            Navigation.NavigateTo("/admin/login");
     }
 
     /// <summary>
@@ -133,10 +78,10 @@ else
     /// </summary>
     private void ChangePathTracking()
     {
-        if (!_isAuthorized || string.IsNullOrEmpty(_newPath)) return;
+        if (string.IsNullOrEmpty(_newPath)) return;
 
         WatchDog.ChangePathForTracking(_newPath);
-        
+
         Ef.Logs.Add(new Log
         {
             Date = DateOnly.FromDateTime(DateTime.Now),
@@ -148,8 +93,6 @@ else
 
     private void ChangePathTracking(Log newValue)
     {
-        if (!_isAuthorized) return;
-
         WatchDog.ChangePathForTracking(newValue.Path);
     }
 
@@ -158,8 +101,6 @@ else
     /// </summary>
     private List<Log> GetHistoryApp()
     {
-        if (!_isAuthorized) return [];
-
         return Ef.Logs.OrderByDescending(d => d.Date).Distinct().ToList();
     }
 
@@ -168,8 +109,6 @@ else
     /// </summary>
     private void ClearHistory()
     {
-        if (!_isAuthorized) return;
-        
         Ef.Logs.RemoveRange(Ef.Logs);
         Ef.SaveChanges();
         StateHasChanged();
