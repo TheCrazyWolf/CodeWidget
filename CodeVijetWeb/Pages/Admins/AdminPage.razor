@@ -1,8 +1,10 @@
 ﻿@page "/admin"
+@using Blazored.LocalStorage
 @using CodeVijetWeb.DB;
 @using CodeVijetWeb.Services
 
 @inject IConfiguration Config;
+@inject ILocalStorageService Storage;
 @inject WatchDogService WatchDog;
 @inject SqlDbContext Ef;
 
@@ -107,15 +109,22 @@ else
     /// </summary>
     private string _stringExceptionMessage = "";
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _password = await Storage.GetItemAsync<string>("Password") ?? string.Empty;
+        CheckPassword();
+    }
+
     /// <summary>
     /// Проверяем пароль админа
     /// </summary>
     private void CheckPassword()
     {
-        if (Config.GetValue<string>("Password") != _password)
-            return;
+        if (Config.GetValue<string>("Password") != _password) return;
 
         _isAuthorized = true;
+        Storage.SetItemAsync("Password", _password);
         StateHasChanged();
     }
 
@@ -159,8 +168,7 @@ else
     /// </summary>
     private void ClearHistory()
     {
-        if (!_isAuthorized)
-            return;
+        if (!_isAuthorized) return;
         
         Ef.Logs.RemoveRange(Ef.Logs);
         Ef.SaveChanges();

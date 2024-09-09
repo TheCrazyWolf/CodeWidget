@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using CodeVijetWeb.DB;
 using CodeVijetWeb.Services;
 using MudBlazor.Services;
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddBlazoredLocalStorage();
 
 /* Регистрация кастомного сервиса */
 builder.Services.AddSingleton<WatchDogService>();
