@@ -12,8 +12,8 @@
 
 @if (_isLongInactive)
 {
-    <MudAlert Class="mb-2" Severity="Severity.Error">
-        Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.
+    <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Error">
+        Возникли проблемы при загрузки листинга. Возможно показ был завершен, но все еще пытаемся загрузить данные. <br/> <br/>Вы можете оставаться здесь или либо перейти на другую страницу
         <br/>
         <MudButton Class="mt-4" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
     </MudAlert>
@@ -23,16 +23,15 @@
 {
     <div class="card rounded">
         <div class="card-body">
-            <h4>Листинг файла: @_currentWidget.FileName</h4>
+            <h4 class="featureFont">Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-            <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю" Color="Color.Info"/>
+            <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю кода" Color="Color.Info"/>
             @if (_isShowHistory)
             {
                 <MudSlider Class="mt-2" @bind-Value="_currentHistory"
-                    Min="@(GetCountSilderHistory(false))" Step="1"
-                    Max="@(GetCountSilderHistory(true))"
-                    Color="Color.Info">
-                    Время: @GetTitleFromHistory()
+                           Min="@(GetCountSilderHistory(false))" Step="1"
+                           Max="@(GetCountSilderHistory(true))"
+                           Color="Color.Info">@GetTitleFromHistory()
                 </MudSlider> 
             }
         </div>
@@ -79,7 +78,7 @@ else
         }
     }
 
-    private int _currentHistory = 0;
+    private int _currentHistory = 1;
 
     /// <summary>
     /// Текущий листинг
@@ -94,7 +93,14 @@ else
         Enabled = true
     };
 
+    /// <summary>
+    /// Показ сообщения, что долго грузится листинг
+    /// </summary>
     private bool _isLongInactive;
+    
+    /// <summary>
+    /// Включение шкалы истории
+    /// </summary>
     private bool _isShowHistory;
 
     private readonly Timer _timeOnDead = new Timer
@@ -116,19 +122,28 @@ else
     {
         if (string.IsNullOrEmpty(Id)) return;
 
-        await Task.Delay(0);
-        //        await InvokeAsync(StateHasChanged);
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += OnTimerUpdateWidget;
         _timeOnDead.Elapsed += OnTimeCheckDeadWidget;
+        await Task.Delay(0);
     }
 
+    /// <summary>
+    /// Метод обрабатывающий проверку мертвый ли листинг
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void OnTimeCheckDeadWidget(object? sender, ElapsedEventArgs e)
     {
         _isLongInactive = _currentWidget is null;
         await InvokeAsync(StateHasChanged);
     }
 
+    /// <summary>
+    /// Обновление листинга
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void OnTimerUpdateWidget(object? sender, ElapsedEventArgs e)
     {
         _currentWidget = WatchDog.GetListingCode(Id ?? string.Empty);
@@ -155,17 +170,27 @@ else
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
 
+    /// <summary>
+    /// Получение минимальной и максимальной истории
+    /// </summary>
+    /// <param name="showMax"></param>
+    /// <returns></returns>
     private int GetCountSilderHistory(bool showMax)
     {
-        var min = _currentWidget?.History.FirstOrDefault()?.Id ?? 0;
+        var min = _currentWidget?.History.FirstOrDefault()?.Id ?? 1;
         var max = _currentWidget?.History.LastOrDefault()?.Id ?? 0;
         return showMax ? max : min;
     }
 
+    /// <summary>
+    /// Получение строки с минутами для истории
+    /// </summary>
+    /// <returns></returns>
     private string GetTitleFromHistory()
     {
-        return _currentWidget?
+        var timeOutMinutes = (TimeOnly.FromDateTime(DateTime.Now) - _currentWidget?
             .History.FirstOrDefault(x => x.Id == _currentHistory)?
-            .TimeStampt.ToString() ?? "Ошибка";
+            .TimeStampt)?.Minutes;
+        return $"{timeOutMinutes} минут назад";
     }
 }
