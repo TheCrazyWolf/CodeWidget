@@ -146,7 +146,7 @@ public class WatchDogService : BackgroundService
                 IdListingCode = GetUniqIdentity(path),
             };
 
-            newWidget.History.Add(new HistoryCode(0,
+            newWidget.History.Add(new HistoryCode(1,
                 TimeOnly.FromDateTime(DateTime.Now), newWidget.Code));
             _widgets.Add(newWidget);
         }
@@ -180,7 +180,7 @@ public class WatchDogService : BackgroundService
                 .Replace(_tagTrackNoCopyable, string.Empty);
             item.IsCopyable = content.Contains(_tagTrackCopyable);
 
-            var newId = lastHistory is null ? 0 : lastHistory.Id + 1;
+            var newId = lastHistory is null ? 1 : lastHistory.Id + 1;
 
             if (lastHistory?.Code.Length == item.Code.Length) continue;
 

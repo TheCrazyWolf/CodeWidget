@@ -12,7 +12,7 @@
 
 @if (_isLongInactive)
 {
-    <MudAlert Severity="Severity.Error">
+    <MudAlert Class="mb-2" Severity="Severity.Error">
         Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.
         <br/>
         <MudButton Class="mt-4" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
@@ -28,7 +28,7 @@
             <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю" Color="Color.Info"/>
             @if (_isShowHistory)
             {
-                <MudSlider Class="mt-2" @bind-Value="CurrentHistory"
+                <MudSlider Class="mt-2" @bind-Value="_currentHistory"
                     Min="@(GetCountSilderHistory(false))" Step="1"
                     Max="@(GetCountSilderHistory(true))"
                     Color="Color.Info">
@@ -43,7 +43,14 @@
             <code>
                 @if (_currentWidget != null)
                 {
-                    @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+                    if (_isShowHistory)
+                    { 
+                        @((MarkupString)RenderTokenizeFromPrism(RenderTokenizeFromHistory()));
+                    }
+                    else
+                    {
+                        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+                    }
                 }
             </code>
         </pre>
@@ -67,30 +74,12 @@ else
         {
             _id = value;
             _isShowHistory = false;
-            _currentHistory = 0;
+            _currentHistory = 1;
             _currentWidget = null;
         }
     }
 
     private int _currentHistory = 0;
-    public int CurrentHistory
-    {
-        get => _currentHistory;
-        set
-        {
-            _currentHistory = value;
-            UpdateFromHistory(value);
-        }
-    }
-
-    private void UpdateFromHistory(int value)
-    {
-        var currentWidgetCode = _currentWidget?.History.FirstOrDefault(x => x.Id == value)?.Code;
-        if (currentWidgetCode == null) return;
-        
-        if (_currentWidget != null)
-            _currentWidget.Code = currentWidgetCode;
-    }
 
     /// <summary>
     /// Текущий листинг
@@ -125,35 +114,40 @@ else
     /// </summary>
     protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrEmpty(Id))
-            return;
+        if (string.IsNullOrEmpty(Id)) return;
 
-        await InvokeAsync(StateHasChanged);
-
+        await Task.Delay(0);
+        //        await InvokeAsync(StateHasChanged);
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
-        _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
-        {
-            _currentWidget = WatchDog.GetListingCode(Id);
-            if(_isShowHistory) CurrentHistory = _currentHistory;
-            await InvokeAsync(StateHasChanged);
-        };
-
-        _timeOnDead.Elapsed += async (object? sender, ElapsedEventArgs e) =>
-        {
-            if (_currentWidget is null)
-                _isLongInactive = true;
-            else
-                _isLongInactive = false;
-            await InvokeAsync(StateHasChanged);
-        };
+        _timer.Elapsed += OnTimerUpdateWidget;
+        _timeOnDead.Elapsed += OnTimeCheckDeadWidget;
     }
 
+    private async void OnTimeCheckDeadWidget(object? sender, ElapsedEventArgs e)
+    {
+        _isLongInactive = _currentWidget is null;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnTimerUpdateWidget(object? sender, ElapsedEventArgs e)
+    {
+        _currentWidget = WatchDog.GetListingCode(Id ?? string.Empty);
+        await InvokeAsync(StateHasChanged);
+    }
+    
     /// <summary>
     /// Рендеринг красивого кода с подстветкой с помощью
     /// библиотеки PRISM
     /// </summary>
     private string RenderTokenizeFromPrism(string value)
         => _prism.Highlight(value, LanguageGrammars.CSharp, "html");
+    
+    /// <summary>
+    /// Рендеринг красивого кода с подстветкой с помощью
+    /// библиотеки PRISM
+    /// </summary>
+    private string RenderTokenizeFromHistory()
+        =>  _currentWidget?.History.FirstOrDefault(x => x.Id == _currentHistory)?.Code ?? string.Empty;
 
     /// <summary>
     /// Рендеринг запрещающего тега для копирования листинга
@@ -170,6 +164,8 @@ else
 
     private string GetTitleFromHistory()
     {
-        return _currentWidget?.History.FirstOrDefault(x => x.Id == _currentHistory)?.TimeStampt.ToString() ?? "Ошибка";
+        return _currentWidget?
+            .History.FirstOrDefault(x => x.Id == _currentHistory)?
+            .TimeStampt.ToString() ?? "Ошибка";
     }
 }
