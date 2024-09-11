@@ -57,8 +57,10 @@ public class WatchDogService : BackgroundService
         _tagTrackCopyable = _configuration.GetValue<string>("tagForTrack") ?? "// track";
         _tagTrackNoCopyable = _configuration.GetValue<string>("tagForTrackAndNoCopy") ?? "// nocopy";
         _timeWait = _configuration.GetValue<int>("TimerForFetchFiles");
-        _blackContainerExtensions = _configuration.GetSection("BlackContainerExtensions").Get<List<string>>() ?? new List<string>();
-        _blackContainerPaths = _configuration.GetSection("BlackContainerPaths").Get<List<string>>() ?? new List<string>();
+        _blackContainerExtensions = _configuration.GetSection("BlackContainerExtensions").Get<List<string>>() ??
+                                    new List<string>();
+        _blackContainerPaths =
+            _configuration.GetSection("BlackContainerPaths").Get<List<string>>() ?? new List<string>();
 
         // Запускаю сервис
         // Мне кажется на этот моменте я что то делаю не так???
@@ -77,7 +79,8 @@ public class WatchDogService : BackgroundService
 
             if (string.IsNullOrEmpty(PathForTracking))
             {
-                _widgets = new List<ListingCode>(); continue;
+                _widgets = new List<ListingCode>();
+                continue;
             }
 
             _widgets = FetchFiles();
@@ -105,13 +108,11 @@ public class WatchDogService : BackgroundService
                            !_blackContainerExtensions.Any(ext =>
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
             .ToArray();
-        
-        var widgets = new List<ListingCode>();
+
 
         foreach (var path in pathProjects)
         {
-            if (!File.Exists(path))
-                continue;
+            if (!File.Exists(path)) continue;
 
             string? content;
 
@@ -125,10 +126,12 @@ public class WatchDogService : BackgroundService
                 continue;
             }
 
-            if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
+            if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable))) continue;
+
+            if (_widgets.FirstOrDefault(x => x.FullPath == path) != null)
                 continue;
 
-            widgets.Add(new ListingCode
+            var newWidget = new ListingCode
             {
                 FullPath = path,
                 ShortPath = $"{path.Split(Path.DirectorySeparatorChar)
@@ -140,11 +143,51 @@ public class WatchDogService : BackgroundService
                     .Replace(_tagTrackNoCopyable, string.Empty),
                 FileName = Path.GetFileName(path),
                 IsCopyable = content.Contains(_tagTrackCopyable),
-                IdListingCode = GetUniqIdentity(path)
-            });
+                IdListingCode = GetUniqIdentity(path),
+            };
+
+            newWidget.History.Add(new HistoryCode(1,
+                TimeOnly.FromDateTime(DateTime.Now), newWidget.Code));
+            _widgets.Add(newWidget);
         }
 
-        return widgets;
+
+        foreach (var item in _widgets.ToList()
+                     .Where(item => File.Exists(item.FullPath)))
+        {
+            string? content;
+
+            try
+            {
+                content = File.ReadAllText(item.FullPath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                continue;
+            }
+
+            if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
+            {
+                _widgets.Remove(item);
+                continue;
+            }
+
+            var lastHistory = item.History
+                .LastOrDefault();
+
+            item.Code = content.Replace(_tagTrackCopyable, string.Empty)
+                .Replace(_tagTrackNoCopyable, string.Empty);
+            item.IsCopyable = content.Contains(_tagTrackCopyable);
+
+            var newId = lastHistory is null ? 1 : lastHistory.Id + 1;
+
+            if (lastHistory?.Code.Length == item.Code.Length) continue;
+
+            item.History.Add(new HistoryCode(newId, TimeOnly.FromDateTime(DateTime.Now), item.Code));
+        }
+
+        return _widgets;
     }
 
     /// <summary>
@@ -188,5 +231,4 @@ public class WatchDogService : BackgroundService
         var hashBytes = md5.ComputeHash(inputBytes);
         return Convert.ToHexString(hashBytes).ToLower(); // .NET 5 +
     }
-    
 }

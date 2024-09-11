@@ -10,5 +10,10 @@ public class ListingCode : WidgetMenu
     /// Допускается ли копирование кода
     /// </summary>
     public bool IsCopyable { get; set; }
-    
+
+    /// <summary>
+    /// История кода
+    /// </summary>
+    public IList<HistoryCode> History { get; set; }
+        = new List<HistoryCode>();
 }
