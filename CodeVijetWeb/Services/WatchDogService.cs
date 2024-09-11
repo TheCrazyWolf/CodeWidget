@@ -61,7 +61,7 @@ public class WatchDogService : BackgroundService
                                     new List<string>();
         _blackContainerPaths =
             _configuration.GetSection("BlackContainerPaths").Get<List<string>>() ?? new List<string>();
-
+    
         // Запускаю сервис
         // Мне кажется на этот моменте я что то делаю не так???
         Task.Run(() => ExecuteAsync(new CancellationToken()));

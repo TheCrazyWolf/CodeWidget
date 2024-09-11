@@ -12,8 +12,8 @@
 
 @if (_isLongInactive)
 {
-    <MudAlert Class="mb-2" Severity="Severity.Error">
-        Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.
+    <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Error">
+        Возникли проблемы при загрузки листинга. Возможно показ был завершен, но все еще пытаемся загрузить данные. <br/> <br/>Вы можете оставаться здесь или либо перейти на другую страницу
         <br/>
         <MudButton Class="mt-4" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
     </MudAlert>
@@ -25,14 +25,13 @@
         <div class="card-body">
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
-            <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю" Color="Color.Info"/>
+            <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю кода" Color="Color.Info"/>
             @if (_isShowHistory)
             {
                 <MudSlider Class="mt-2" @bind-Value="_currentHistory"
-                    Min="@(GetCountSilderHistory(false))" Step="1"
-                    Max="@(GetCountSilderHistory(true))"
-                    Color="Color.Info">
-                    Время: @GetTitleFromHistory()
+                           Min="@(GetCountSilderHistory(false))" Step="1"
+                           Max="@(GetCountSilderHistory(true))"
+                           Color="Color.Info">@GetTitleFromHistory()
                 </MudSlider> 
             }
         </div>
@@ -164,8 +163,9 @@ else
 
     private string GetTitleFromHistory()
     {
-        return _currentWidget?
+        var timeOutMinutes = (TimeOnly.FromDateTime(DateTime.Now) - _currentWidget?
             .History.FirstOrDefault(x => x.Id == _currentHistory)?
-            .TimeStampt.ToString() ?? "Ошибка";
+            .TimeStampt)?.Minutes;
+        return $"{timeOutMinutes} минут назад";
     }
 }
