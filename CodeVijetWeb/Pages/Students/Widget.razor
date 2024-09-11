@@ -23,7 +23,7 @@
 {
     <div class="card rounded">
         <div class="card-body">
-            <h4>Листинг файла: @_currentWidget.FileName</h4>
+            <h4 class="featureFont">Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
             <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю кода" Color="Color.Info"/>
             @if (_isShowHistory)
