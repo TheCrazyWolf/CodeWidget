@@ -78,7 +78,7 @@ else
         }
     }
 
-    private int _currentHistory = 0;
+    private int _currentHistory = 1;
 
     /// <summary>
     /// Текущий листинг
@@ -93,7 +93,14 @@ else
         Enabled = true
     };
 
+    /// <summary>
+    /// Показ сообщения, что долго грузится листинг
+    /// </summary>
     private bool _isLongInactive;
+    
+    /// <summary>
+    /// Включение шкалы истории
+    /// </summary>
     private bool _isShowHistory;
 
     private readonly Timer _timeOnDead = new Timer
@@ -115,19 +122,28 @@ else
     {
         if (string.IsNullOrEmpty(Id)) return;
 
-        await Task.Delay(0);
-        //        await InvokeAsync(StateHasChanged);
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += OnTimerUpdateWidget;
         _timeOnDead.Elapsed += OnTimeCheckDeadWidget;
+        await Task.Delay(0);
     }
 
+    /// <summary>
+    /// Метод обрабатывающий проверку мертвый ли листинг
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void OnTimeCheckDeadWidget(object? sender, ElapsedEventArgs e)
     {
         _isLongInactive = _currentWidget is null;
         await InvokeAsync(StateHasChanged);
     }
 
+    /// <summary>
+    /// Обновление листинга
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void OnTimerUpdateWidget(object? sender, ElapsedEventArgs e)
     {
         _currentWidget = WatchDog.GetListingCode(Id ?? string.Empty);
@@ -154,13 +170,22 @@ else
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
 
+    /// <summary>
+    /// Получение минимальной и максимальной истории
+    /// </summary>
+    /// <param name="showMax"></param>
+    /// <returns></returns>
     private int GetCountSilderHistory(bool showMax)
     {
-        var min = _currentWidget?.History.FirstOrDefault()?.Id ?? 0;
+        var min = _currentWidget?.History.FirstOrDefault()?.Id ?? 1;
         var max = _currentWidget?.History.LastOrDefault()?.Id ?? 0;
         return showMax ? max : min;
     }
 
+    /// <summary>
+    /// Получение строки с минутами для истории
+    /// </summary>
+    /// <returns></returns>
     private string GetTitleFromHistory()
     {
         var timeOutMinutes = (TimeOnly.FromDateTime(DateTime.Now) - _currentWidget?
