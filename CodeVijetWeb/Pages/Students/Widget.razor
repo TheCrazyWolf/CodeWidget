@@ -15,7 +15,7 @@
     <MudAlert Severity="Severity.Error">
         Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.
         <br/>
-        <MudButton Class="mt-2" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
+        <MudButton Class="mt-4" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
     </MudAlert>
 }
 
@@ -28,12 +28,12 @@
             <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю" Color="Color.Info"/>
             @if (_isShowHistory)
             {
-                <MudSlider @bind-Value="CurrentHistory"
+                <MudSlider Class="mt-2" @bind-Value="CurrentHistory"
                     Min="@(GetCountSilderHistory(false))" Step="1"
                     Max="@(GetCountSilderHistory(true))"
                     Color="Color.Info">
                     Время: @GetTitleFromHistory()
-                </MudSlider>
+                </MudSlider> 
             }
         </div>
     </div>
@@ -66,6 +66,8 @@ else
         set
         {
             _id = value;
+            _isShowHistory = false;
+            _currentHistory = 0;
             _currentWidget = null;
         }
     }
