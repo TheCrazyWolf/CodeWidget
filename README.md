@@ -35,5 +35,5 @@ dotnet publish -r win-x64 -c Release
 2. Сокращать черный список папой и файлов расширений BlackContainerPaths и BlackContainerExtensions
 
 # Пример
-![alt text](https://github.com/TheCrazyWolf/CodeWidget/blob/master/source/example.png?raw=true)
+![alt text](https://github.com/TheCrazyWolf/CodeWidget/blob/master/example.png?raw=true)
 
