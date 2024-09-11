@@ -12,14 +12,14 @@
 
 <PageTitle>Админ-панель</PageTitle>
 
-@if (string.IsNullOrEmpty(WatchDog.PathForTracking))
+@if (string.IsNullOrEmpty(WatchDog.GetCurrentTrackingPath()))
 {
     <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Warning">Сейчас не ведется трансляция кода</MudAlert>
 }
 else
 {
     <MudAlert Class="mb-2" Variant="Variant.Outlined" Severity="Severity.Info">
-        Сейчас транслируется код из директории: @WatchDog.PathForTracking
+        Сейчас транслируется код из директории: @WatchDog.GetCurrentTrackingPath()
         <br/><MudButton Class="mt-2" Size="Size.Small" OnClick="StopService" Variant="Variant.Outlined" Color="Color.Error">Остановить</MudButton>
     </MudAlert>
 }
@@ -80,7 +80,7 @@ else
     {
         if (string.IsNullOrEmpty(_newPath)) return;
 
-        WatchDog.ChangePathForTracking(_newPath);
+        WatchDog.ChangePathForTrackingSafely(_newPath);
 
         Ef.Logs.Add(new Log
         {
@@ -93,7 +93,7 @@ else
 
     private void ChangePathTracking(Log newValue)
     {
-        WatchDog.ChangePathForTracking(newValue.Path);
+        WatchDog.ChangePathForTrackingSafely(newValue.Path);
     }
 
     /// <summary>
@@ -121,8 +121,6 @@ else
     }
 
     private void StopService()
-    {
-        WatchDog.PathForTracking = string.Empty;
-    }
+        => WatchDog.ChangePathForTrackingUnSafely(string.Empty);
 
 }

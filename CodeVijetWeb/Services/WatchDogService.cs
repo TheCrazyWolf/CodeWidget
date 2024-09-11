@@ -14,7 +14,7 @@ public class WatchDogService : BackgroundService
     /// <summary>
     /// Текущий путь для отслеживания
     /// </summary>
-    public string PathForTracking { get; set; } = "";
+    private string _pathForTracking = "";
 
     /// <summary>
     /// Ожидание задержки
@@ -24,13 +24,11 @@ public class WatchDogService : BackgroundService
 
     /// <summary>
     /// Черный список папок для игнора
-    /// TODO: необходимо вынести в конфиг файл
     /// </summary>
     private readonly IEnumerable<string> _blackContainerPaths;
 
     /// <summary>
     /// Черный список расширений файлов для игнора
-    /// TODO: необходимо вынести в конфиг файл
     /// </summary>
     private readonly IEnumerable<string> _blackContainerExtensions;
 
@@ -77,7 +75,7 @@ public class WatchDogService : BackgroundService
         {
             await Task.Delay(_timeWait, stoppingToken);
 
-            if (string.IsNullOrEmpty(PathForTracking))
+            if (string.IsNullOrEmpty(_pathForTracking))
             {
                 _widgets = new List<ListingCode>();
                 continue;
@@ -91,11 +89,14 @@ public class WatchDogService : BackgroundService
     /// Смена пути файла для отслеживания
     /// </summary>
     /// <param name="newPath"></param>
-    public void ChangePathForTracking(string newPath)
+    public void ChangePathForTrackingSafely(string newPath)
     {
-        /* Надо реализовать более адекватную проверку, пока что не до неё
-         */
-        PathForTracking = string.IsNullOrEmpty(newPath) ? PathForTracking : newPath;
+        _pathForTracking = string.IsNullOrEmpty(newPath) ? _pathForTracking : newPath;
+    }
+    
+    public void ChangePathForTrackingUnSafely(string newPath)
+    {
+        _pathForTracking = newPath;
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ public class WatchDogService : BackgroundService
     /// </summary>
     private IList<ListingCode> FetchFiles()
     {
-        var pathProjects = Directory.EnumerateFiles(PathForTracking, "*.*", SearchOption.AllDirectories)
+        var pathProjects = Directory.EnumerateFiles(_pathForTracking, "*.*", SearchOption.AllDirectories)
             .Where(file => !_blackContainerPaths.Any(file.Contains) &&
                            !_blackContainerExtensions.Any(ext =>
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
@@ -114,23 +115,15 @@ public class WatchDogService : BackgroundService
         {
             if (!File.Exists(path)) continue;
 
-            string? content;
+            string content = TryReadFileContent(path);
 
-            try
-            {
-                content = File.ReadAllText(path);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-
+            // проверка на тегов
             if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable))) continue;
+            
+            // Если такой уже виджет в коллекции
+            if (_widgets.FirstOrDefault(x => x.FullPath == path) != null) continue;
 
-            if (_widgets.FirstOrDefault(x => x.FullPath == path) != null)
-                continue;
-
+            // генерация нового виджета
             var newWidget = new ListingCode
             {
                 FullPath = path,
@@ -148,46 +141,64 @@ public class WatchDogService : BackgroundService
 
             newWidget.History.Add(new HistoryCode(1,
                 TimeOnly.FromDateTime(DateTime.Now), newWidget.Code));
+            
+            // добавление
             _widgets.Add(newWidget);
         }
 
 
+        // Перебираем существующие виджеты для обновления
         foreach (var item in _widgets.ToList()
                      .Where(item => File.Exists(item.FullPath)))
         {
-            string? content;
-
-            try
-            {
-                content = File.ReadAllText(item.FullPath);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-
+            string content = TryReadFileContent(item.FullPath);
+            
             if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
             {
-                _widgets.Remove(item);
-                continue;
+                // удаляем если больше не трекаем
+                _widgets.Remove(item); continue;
             }
 
-            var lastHistory = item.History
-                .LastOrDefault();
+            // дергаем прошлую историю кода
+            var lastHistory = item.History.LastOrDefault();
 
+            // обновляем кол
             item.Code = content.Replace(_tagTrackCopyable, string.Empty)
                 .Replace(_tagTrackNoCopyable, string.Empty);
             item.IsCopyable = content.Contains(_tagTrackCopyable);
 
-            var newId = lastHistory is null ? 1 : lastHistory.Id + 1;
-
+            // изменилась ли длина кода по сравнению с предыдущим
             if (lastHistory?.Code.Length == item.Code.Length) continue;
-
+            
+            // новый id для истории
+            var newId = lastHistory is null ? 1 : lastHistory.Id + 1;
+            
+            // если изменилась, добавляем историю
             item.History.Add(new HistoryCode(newId, TimeOnly.FromDateTime(DateTime.Now), item.Code));
         }
 
         return _widgets;
+    }
+
+    /// <summary>
+    /// Считываем содежимое файлов
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private string TryReadFileContent(string path)
+    {
+        string content = string.Empty;
+        
+        try
+        {
+            content = File.ReadAllText(path);
+        }
+        catch 
+        {
+            // ignored
+        }
+
+        return content;
     }
 
     /// <summary>
@@ -226,9 +237,15 @@ public class WatchDogService : BackgroundService
     /// <returns></returns>
     private string GetUniqIdentity(string fullPath)
     {
-        using var md5 = MD5.Create();
         var inputBytes = Encoding.ASCII.GetBytes(fullPath);
-        var hashBytes = md5.ComputeHash(inputBytes);
+        var hashBytes = MD5.HashData(inputBytes);
         return Convert.ToHexString(hashBytes).ToLower(); // .NET 5 +
     }
+
+    /// <summary>
+    /// Возращает текущую директорию для отслеживания
+    /// </summary>
+    /// <returns></returns>
+    public string GetCurrentTrackingPath()
+        => _pathForTracking;
 }
