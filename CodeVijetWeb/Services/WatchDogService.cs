@@ -105,13 +105,12 @@ public class WatchDogService : BackgroundService
                            !_blackContainerExtensions.Any(ext =>
                                file.EndsWith("." + ext, StringComparison.OrdinalIgnoreCase)))
             .ToArray();
-        
-        var widgets = new List<ListingCode>();
 
+        var widgetsNew = _widgets.ToList();
+        
         foreach (var path in pathProjects)
         {
-            if (!File.Exists(path))
-                continue;
+            if (!File.Exists(path)) continue;
 
             string? content;
 
@@ -121,14 +120,12 @@ public class WatchDogService : BackgroundService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                continue;
+                Console.WriteLine(e.Message); continue;
             }
 
-            if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
-                continue;
+            if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable))) continue;
 
-            widgets.Add(new ListingCode
+            var newWidget = new ListingCode
             {
                 FullPath = path,
                 ShortPath = $"{path.Split(Path.DirectorySeparatorChar)
@@ -141,10 +138,35 @@ public class WatchDogService : BackgroundService
                 FileName = Path.GetFileName(path),
                 IsCopyable = content.Contains(_tagTrackCopyable),
                 IdListingCode = GetUniqIdentity(path)
-            });
+            };
+
+            var currentWidget = widgetsNew
+                .FirstOrDefault(x => x.IdListingCode == newWidget.IdListingCode);
+
+            if (currentWidget is not null)
+            {
+                var lastHistory = currentWidget.History
+                    .LastOrDefault();
+
+                currentWidget.Code = newWidget.Code;
+                currentWidget.IsCopyable = newWidget.IsCopyable;
+                
+                var newId = lastHistory is null ? 0 : lastHistory.Id + 1;
+
+                if(lastHistory?.Code.Length == newWidget.Code.Length)
+                    continue;
+                
+                currentWidget.History.Add(new HistoryCode(newId, 
+                    TimeOnly.FromDateTime(DateTime.Now), currentWidget.Code));
+            }
+            else
+            {
+                widgetsNew.Add(newWidget);
+            }
         }
 
-        return widgets;
+        _widgets = widgetsNew;
+        return _widgets;
     }
 
     /// <summary>

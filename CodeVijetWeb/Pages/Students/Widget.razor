@@ -12,7 +12,8 @@
 
 @if (_isLongInactive)
 {
-    <MudAlert Severity="Severity.Error">Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.  
+    <MudAlert Severity="Severity.Error">
+        Ого! Кажется листинг загружается дольше чем ожидалось. Возможно трансляция кода уже прекратилась, но попытки продолжаются.
         <br/>
         <MudButton Class="mt-2" Size="Size.Small" Href="/" Variant="Variant.Outlined" Color="Color.Error">Главная страница</MudButton>
     </MudAlert>
@@ -24,6 +25,16 @@
         <div class="card-body">
             <h4>Листинг файла: @_currentWidget.FileName</h4>
             <input readonly="" type="text" value="@_currentWidget.FullPath" class="form-control">
+            <MudSwitch @bind-Value="_isShowHistory" Label="Показать историю" Color="Color.Info"/>
+            @if (_isShowHistory)
+            {
+                <MudSlider @bind-Value="CurrentHistory"
+                    Min="@(GetCountSilderHistory(false))" Step="1"
+                    Max="@(GetCountSilderHistory(true))"
+                    Color="Color.Info">
+                    Время: @GetTitleFromHistory()
+                </MudSlider>
+            }
         </div>
     </div>
 
@@ -40,13 +51,16 @@
 }
 else
 {
-    <MudProgressCircular Color="Color.Info" Indeterminate="true" Style="margin: 15px;" />
+    <MudProgressCircular Color="Color.Info" Indeterminate="true" Style="margin: 15px;"/>
 }
 
 @code
 {
     private string? _id;
-    [Parameter] [SupplyParameterFromQuery] public string? Id
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Id
     {
         get => _id;
         set
@@ -54,6 +68,26 @@ else
             _id = value;
             _currentWidget = null;
         }
+    }
+
+    private int _currentHistory = 0;
+    public int CurrentHistory
+    {
+        get => _currentHistory;
+        set
+        {
+            _currentHistory = value;
+            UpdateFromHistory(value);
+        }
+    }
+
+    private void UpdateFromHistory(int value)
+    {
+        var currentWidgetCode = _currentWidget?.History.FirstOrDefault(x => x.Id == value)?.Code;
+        if (currentWidgetCode == null) return;
+        
+        if (_currentWidget != null)
+            _currentWidget.Code = currentWidgetCode;
     }
 
     /// <summary>
@@ -70,6 +104,8 @@ else
     };
 
     private bool _isLongInactive;
+    private bool _isShowHistory;
+
     private readonly Timer _timeOnDead = new Timer
     {
         Enabled = true,
@@ -91,21 +127,21 @@ else
             return;
 
         await InvokeAsync(StateHasChanged);
-        
+
         _timer.Interval = WatchDog.GetTimeWaitFromConfig();
         _timer.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
             _currentWidget = WatchDog.GetListingCode(Id);
+            if(_isShowHistory) CurrentHistory = _currentHistory;
             await InvokeAsync(StateHasChanged);
         };
 
         _timeOnDead.Elapsed += async (object? sender, ElapsedEventArgs e) =>
         {
-            if(_currentWidget is null)
+            if (_currentWidget is null)
                 _isLongInactive = true;
             await InvokeAsync(StateHasChanged);
         };
-        
     }
 
     /// <summary>
@@ -120,5 +156,16 @@ else
     /// </summary>
     private string RenderNoCopyClass(bool isCopyable)
         => isCopyable ? string.Empty : "pre-no";
-    
+
+    private int GetCountSilderHistory(bool showMax)
+    {
+        var min = _currentWidget?.History.FirstOrDefault()?.Id ?? 0;
+        var max = _currentWidget?.History.LastOrDefault()?.Id ?? 0;
+        return showMax ? max : min;
+    }
+
+    private string GetTitleFromHistory()
+    {
+        return _currentWidget?.History.FirstOrDefault(x => x.Id == _currentHistory)?.TimeStampt.ToString() ?? "Ошибка";
+    }
 }
