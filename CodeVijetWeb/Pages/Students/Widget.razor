@@ -140,6 +140,8 @@ else
         {
             if (_currentWidget is null)
                 _isLongInactive = true;
+            else
+                _isLongInactive = false;
             await InvokeAsync(StateHasChanged);
         };
     }
