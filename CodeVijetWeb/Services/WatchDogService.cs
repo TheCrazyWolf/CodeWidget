@@ -148,9 +148,14 @@ public class WatchDogService : BackgroundService
 
 
         // Перебираем существующие виджеты для обновления
-        foreach (var item in _widgets.ToList()
-                     .Where(item => File.Exists(item.FullPath)))
+        foreach (var item in _widgets.ToList())
         {
+            // после удаления файла, чтобы виджет пропадал
+            if (!File.Exists(item.FullPath))
+            {
+                _widgets.Remove(item); continue;
+            }
+            
             string content = TryReadFileContent(item.FullPath);
             
             if (!(content.Contains(_tagTrackCopyable) || content.Contains(_tagTrackNoCopyable)))
