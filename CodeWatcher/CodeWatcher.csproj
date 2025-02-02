@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>free-icon-food-waste-12184584.ico</ApplicationIcon>
+    <AssemblyName>CodeWatcher</AssemblyName>
+    <RootNamespace>CodeWatcher</RootNamespace>
+    <PackageId>CodeWatcher</PackageId>
+    <Authors>Kulagin, Ahtyamov</Authors>
+    <Company>CodeWatcher</Company>
+    <Product>CodeWatcher</Product>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CodeVijetWeb.DB;
+namespace CodeWatcher.DB;
 
 public class Log
 {

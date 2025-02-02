@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace CodeVijetWeb.DB;
+namespace CodeWatcher.DB;
 
 public sealed class SqlDbContext : DbContext
 {

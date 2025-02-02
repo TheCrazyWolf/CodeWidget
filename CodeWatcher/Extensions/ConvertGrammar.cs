@@ -1,6 +1,6 @@
 ﻿using PrismSharp.Core;
 
-namespace CodeVijetWeb.Extensions;
+namespace CodeWatcher.Extensions;
 
 public class ConvertGrammar
 {

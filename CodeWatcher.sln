@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeVijetWeb", "CodeVijetWeb\CodeVijetWeb.csproj", "{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWatcher", "CodeWatcher\CodeWatcher.csproj", "{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{28BD1754-C633-4D54-ACFD-9EF98260F3F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

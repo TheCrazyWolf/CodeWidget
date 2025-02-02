@@ -1,6 +1,6 @@
 using Blazored.LocalStorage;
-using CodeVijetWeb.DB;
-using CodeVijetWeb.Services;
+using CodeWatcher.DB;
+using CodeWatcher.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);

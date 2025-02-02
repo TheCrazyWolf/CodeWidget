@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using CodeVijetWeb.Models;
+using CodeWatcher.Models;
 
-namespace CodeVijetWeb.Services;
+namespace CodeWatcher.Services;
 
 /*
  * Сервис отслеживающий файлы для
