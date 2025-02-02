@@ -3,7 +3,7 @@
 @using CodeVijetWeb.Models
 @using CodeVijetWeb.Services
 @using System.Timers
-@using PrismSharp.Core
+@using CodeVijetWeb.Extensions
 @using PrismSharp.Highlighting.HTML
 
 @inject WatchDogService WatchDog;
@@ -44,11 +44,11 @@
                 {
                     if (_isShowHistory)
                     { 
-                        @((MarkupString)RenderTokenizeFromPrism(RenderTokenizeFromHistory()));
+                        @((MarkupString)RenderTokenizeFromPrism(RenderTokenizeFromHistory(), _currentWidget.FileName.Split('.').Last()));
                     }
                     else
                     {
-                        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code))
+                        @((MarkupString)RenderTokenizeFromPrism(_currentWidget.Code, _currentWidget.FileName.Split('.').Last()))
                     }
                 }
             </code>
@@ -154,8 +154,8 @@ else
     /// Рендеринг красивого кода с подстветкой с помощью
     /// библиотеки PRISM
     /// </summary>
-    private string RenderTokenizeFromPrism(string value)
-        => _prism.Highlight(value, LanguageGrammars.CSharp, "html");
+    private string RenderTokenizeFromPrism(string value, string fileExtensions)
+        => _prism.Highlight(value, ConvertGrammar.Convert(fileExtensions), "html");
     
     /// <summary>
     /// Рендеринг красивого кода с подстветкой с помощью
