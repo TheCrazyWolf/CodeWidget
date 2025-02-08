@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using CodeShare.Models;
+using CodeShare.Models.Models;
 
 namespace CodeShare.Services;
 

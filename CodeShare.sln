@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FC855FDD-304
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "models", "models", "{07C1104C-2168-4187-855E-622FA5D69E86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeShare.Models", "CodeShare.Models\CodeShare.Models.csproj", "{9E8FC80B-A082-4138-86EE-803F4AA5DB27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E8FC80B-A082-4138-86EE-803F4AA5DB27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E8FC80B-A082-4138-86EE-803F4AA5DB27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E8FC80B-A082-4138-86EE-803F4AA5DB27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E8FC80B-A082-4138-86EE-803F4AA5DB27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -28,5 +34,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C} = {FC855FDD-304F-454E-B6D0-382FE68CD0B3}
+		{9E8FC80B-A082-4138-86EE-803F4AA5DB27} = {07C1104C-2168-4187-855E-622FA5D69E86}
 	EndGlobalSection
 EndGlobal

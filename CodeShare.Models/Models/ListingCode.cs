@@ -1,4 +1,4 @@
-﻿namespace CodeShare.Models;
+﻿namespace CodeShare.Models.Models;
 
 public class ListingCode : WidgetMenu
 {
