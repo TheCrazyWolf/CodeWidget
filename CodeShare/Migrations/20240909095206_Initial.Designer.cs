@@ -20,7 +20,7 @@ namespace CodeVijetWeb.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.14");
 
-            modelBuilder.Entity("CodeVijetWeb.DB.Log", b =>
+            modelBuilder.Entity("CodeShare.DB.Log", b =>
                 {
                     b.Property<int>("LogsId")
                         .ValueGeneratedOnAdd()
