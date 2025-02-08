@@ -45,4 +45,16 @@ public class HistoryManager
         _history.Add(new HistorySession() { Path = path, AddedAt = DateTime.Now });
         SaveHistory();
     }
+
+    public void ClearHistory()
+    {
+        _history.Clear();
+        SaveHistory();
+    }
+
+    public void Remove(HistorySession item)
+    {
+        _history.Remove(item);
+        SaveHistory();
+    }
 }

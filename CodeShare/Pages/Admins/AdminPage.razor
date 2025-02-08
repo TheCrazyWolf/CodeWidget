@@ -1,14 +1,16 @@
 ﻿@page "/admin"
 
+@using System.Globalization
 @using Blazored.LocalStorage
-@using CodeShare.DB
+@using CodeShare.History.Storage
+@using CodeShare.Models.History
 @using CodeShare.Services
 
 @inject IConfiguration Config;
 @inject NavigationManager Navigation;
 @inject ILocalStorageService Storage;
 @inject WatchDogService WatchDog;
-@inject SqlDbContext Ef;
+@inject HistoryManager HistoryManager;
 
 <PageTitle>Админ-панель</PageTitle>
 
@@ -45,7 +47,7 @@ else
             <MudTextField Value="item.Path" T="string"
                           ReadOnly="true"
                           FullWidth="true"
-                          Label="@item.Date.ToString()" Variant="Variant.Text">
+                          Label="@item.AddedAt.ToString(CultureInfo.CurrentCulture)" Variant="Variant.Text">
             </MudTextField>
             <br/>
             <MudStack Row="true">
@@ -81,17 +83,11 @@ else
         if (string.IsNullOrEmpty(_newPath)) return;
 
         WatchDog.ChangePathForTrackingSafely(_newPath);
-
-        Ef.Logs.Add(new Log
-        {
-            Date = DateOnly.FromDateTime(DateTime.Now),
-            Path = _newPath
-        });
-        Ef.SaveChanges();
+        HistoryManager.AddHistory(_newPath);
         StateHasChanged();
     }
 
-    private void ChangePathTracking(Log newValue)
+    private void ChangePathTracking(HistorySession newValue)
     {
         WatchDog.ChangePathForTrackingSafely(newValue.Path);
     }
@@ -99,9 +95,9 @@ else
     /// <summary>
     /// Возращает историю последних проектов из Базы данных
     /// </summary>
-    private List<Log> GetHistoryApp()
+    private List<HistorySession> GetHistoryApp()
     {
-        return Ef.Logs.OrderByDescending(d => d.Date).Distinct().ToList();
+        return HistoryManager.GetHistoryAsync().ToList();
     }
 
     /// <summary>
@@ -109,18 +105,15 @@ else
     /// </summary>
     private void ClearHistory()
     {
-        Ef.Logs.RemoveRange(Ef.Logs);
-        Ef.SaveChanges();
+        HistoryManager.ClearHistory();
         StateHasChanged();
     }
 
-    private async Task RemoveFromHistory(Log item)
+    private void RemoveFromHistory(HistorySession item)
     {
-        Ef.Remove(item);
-        await Ef.SaveChangesAsync();
+        HistoryManager.Remove(item);
     }
 
-    private void StopService()
-        => WatchDog.ChangePathForTrackingUnSafely(string.Empty);
+    private void StopService() => WatchDog.ChangePathForTrackingUnSafely(string.Empty);
 
 }

@@ -1,5 +1,4 @@
 using Blazored.LocalStorage;
-using CodeShare.DB;
 using CodeShare.History.Storage;
 using CodeShare.Services;
 using MudBlazor.Services;
@@ -21,8 +20,6 @@ builder.Configuration.AddJsonFile("appsettings.json");
 builder.WebHost.ConfigureKestrel(
     options => options.ListenAnyIP(builder.Configuration.GetValue<int>("HostPort")));
 
-/* Добавление Контекста подключения в завимости */
-builder.Services.AddDbContext<SqlDbContext>();
 builder.Services.AddMudServices();
 
 var app = builder.Build();
