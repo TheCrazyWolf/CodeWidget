@@ -43,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeShare.History.Storage\CodeShare.History.Storage.csproj" />
     <ProjectReference Include="..\CodeShare.Models\CodeShare.Models.csproj" />
   </ItemGroup>
 
