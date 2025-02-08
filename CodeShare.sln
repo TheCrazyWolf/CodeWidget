@@ -5,6 +5,10 @@ VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeShare", "CodeShare\CodeShare.csproj", "{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FC855FDD-304F-454E-B6D0-382FE68CD0B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "models", "models", "{07C1104C-2168-4187-855E-622FA5D69E86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1F4D891-6049-42E6-993B-3DA1990F42A8}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C} = {FC855FDD-304F-454E-B6D0-382FE68CD0B3}
 	EndGlobalSection
 EndGlobal

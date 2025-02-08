@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace CodeVijetWeb.DB;
+namespace CodeShare.DB;
 
 public sealed class SqlDbContext : DbContext
 {

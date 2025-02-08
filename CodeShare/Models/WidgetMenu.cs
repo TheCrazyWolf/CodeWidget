@@ -1,4 +1,4 @@
-﻿namespace CodeVijetWeb.Models;
+﻿namespace CodeShare.Models;
 
 public class WidgetMenu
 {
