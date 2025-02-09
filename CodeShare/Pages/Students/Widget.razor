@@ -61,21 +61,10 @@ else
 
 @code
 {
-    private string? _id;
-
+    
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? Id
-    {
-        get => _id;
-        set
-        {
-            _id = value;
-            _isShowHistory = false;
-            _currentHistory = 1;
-            _currentWidget = null;
-        }
-    }
+    public string? Id { get; set; }
 
     private int _currentHistory = 1;
 
@@ -191,5 +180,14 @@ else
             .History.FirstOrDefault(x => x.Id == _currentHistory)?
             .TimeStampt)?.Minutes;
         return $"{timeOutMinutes} минут назад";
+    }
+
+
+    protected override Task OnParametersSetAsync()
+    {
+        _isShowHistory = false;
+        _currentHistory = 1;
+        _currentWidget = null;
+        return base.OnParametersSetAsync();
     }
 }
