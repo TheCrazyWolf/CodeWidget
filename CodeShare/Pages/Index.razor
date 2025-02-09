@@ -2,28 +2,34 @@
 @page "/index"
 
 <PageTitle>
-    CodeWidget
+    ShareCode
 </PageTitle>
 
-<MudAlert Class="mb-4" Severity="Severity.Info">Версия: Ну вроде работает
-    <MudStack Class="mt-4" Row="true">
-        <MudButton Href="https://github.com/frakiec89"
-                   Target="_blank"
-                   Variant="Variant.Text"
-                   EndIcon="@Icons.Custom.Brands.GitHub"
-                   Color="Color.Secondary"
-                   Style="text-transform:none">
-            frakiec89
-        </MudButton>
+<MudAlert Class="mb-4" Severity="Severity.Info"> Вы используете версию: @ThisAssembly.Git.Branch/@ThisAssembly.Git.Commit от @ThisAssembly.Git.CommitDate
+    <MudStack Class="mt-4" Spacing="0" Row="true">
+        <MudChip T="string"
+                 Href="https://github.com/TheCrazyWolf/ShareCode"
+                 Target="_blank"
+                 Variant="Variant.Filled"
+                 Icon="@Icons.Custom.Brands.GitHub">
+            GitHub
+        </MudChip>
 
-        <MudButton Href="https://github.com/TheCrazyWolf"
-                   Target="_blank"
-                   Variant="Variant.Text"
-                   EndIcon="@Icons.Custom.Brands.GitHub"
-                   Color="Color.Info"
-                   Style="text-transform:none">
+        <MudChip T="string"
+                 Href="https://github.com/frakiec89"
+                 Target="_blank"
+                 Variant="Variant.Filled"
+                 Icon="@Icons.Material.Filled.Person">
+            frakiec89
+        </MudChip>
+
+        <MudChip T="string"
+                 Href="https://github.com/TheCrazyWolf"
+                 Target="_blank"
+                 Variant="Variant.Filled"
+                 Icon="@Icons.Material.Filled.Person">
             TheCrazyWolf
-        </MudButton>
+        </MudChip>
     </MudStack>
 </MudAlert>
 
