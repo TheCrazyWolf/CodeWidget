@@ -1,8 +1,10 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using CodeShare.Models.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
-namespace CodeShare.Services;
+namespace CodeShare.Background.Tasks;
 
 /*
  * Сервис отслеживающий файлы для

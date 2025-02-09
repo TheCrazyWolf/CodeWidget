@@ -1,6 +1,6 @@
 using Blazored.LocalStorage;
+using CodeShare.Background.Tasks;
 using CodeShare.History.Storage;
-using CodeShare.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +12,7 @@ builder.Services.AddBlazoredLocalStorage();
 /* Регистрация кастомного сервиса */
 builder.Services.AddSingleton<WatchDogService>();
 builder.Services.AddSingleton<HistoryManager>();
+     
 /* Добавление файла с настройками */
 builder.Configuration.AddJsonFile("appsettings.json");
 

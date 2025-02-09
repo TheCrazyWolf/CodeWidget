@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeShare.Models", "CodeSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeShare.History.Storage", "CodeShare.History.Storage\CodeShare.History.Storage.csproj", "{E277EE4A-7284-4216-8F9E-EBFF7D9A765A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeShare.Background.Tasks", "CodeShare.Background.Tasks\CodeShare.Background.Tasks.csproj", "{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{E277EE4A-7284-4216-8F9E-EBFF7D9A765A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E277EE4A-7284-4216-8F9E-EBFF7D9A765A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E277EE4A-7284-4216-8F9E-EBFF7D9A765A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,5 +48,6 @@ Global
 		{9C2CB59A-58B8-40F6-9AA5-0FC868A8685C} = {FC855FDD-304F-454E-B6D0-382FE68CD0B3}
 		{9E8FC80B-A082-4138-86EE-803F4AA5DB27} = {07C1104C-2168-4187-855E-622FA5D69E86}
 		{E277EE4A-7284-4216-8F9E-EBFF7D9A765A} = {FC855FDD-304F-454E-B6D0-382FE68CD0B3}
+		{A04A4C4F-5AB0-444F-BA45-D912E08EF7B2} = {FC855FDD-304F-454E-B6D0-382FE68CD0B3}
 	EndGlobalSection
 EndGlobal
